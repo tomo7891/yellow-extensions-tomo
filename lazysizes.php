@@ -1,4 +1,5 @@
 <?php
+// Lazysizes extension
 //https://github.com/aFarkas/lazysizes
 class YellowLazysizes
 {
