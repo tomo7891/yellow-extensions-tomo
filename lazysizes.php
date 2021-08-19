@@ -27,9 +27,8 @@ class YellowLazysizes
     {
         $output = null;
         $text = preg_replace_callback('/<img([^>]*)>/', function ($matches) {
-            $match = rtrim($matches[1], '/');
-            if(strpos($match,'lazyload') !== false){
-            $match = str_replace(' src=', ' data-src=', $match);
+            if(strpos($matches[1],'lazyload') !== false){
+            $match = str_replace(' src=', ' data-src=', $matches[1]);
           }
             return '<img'. $match .'>';
         }, $text);
