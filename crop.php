@@ -1,4 +1,5 @@
 <?php
+// Crop extension
 class YellowCrop
 {
     const VERSION = "0.8.10";
