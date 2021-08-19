@@ -1,4 +1,5 @@
 <?php
+// Shortcuts extension
 class YellowShortcuts
 {
     const VERSION = "0.8.10";
