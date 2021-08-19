@@ -21,19 +21,19 @@ class YellowCrop
           case 'xl':
           case 'll':
           case '2l':
-          $length = '1024';
+          $length = '1280';
           break;
           case 'lg':
           case 'l':
-          $length = '900';
+          $length = '1024';
           break;
           case 'md':
           case 'm':
-          $length = '600';
+          $length = '640';
           break;
           case 'sm':
           case 's':
-          $length = '300';
+          $length = '400';
           break;
           case 'xs':
           case 'ss':
