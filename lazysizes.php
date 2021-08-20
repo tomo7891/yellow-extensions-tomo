@@ -16,7 +16,7 @@ class YellowLazysizes
         $output = null;
         if ($name == 'header') {
                 $extensionLocation = $this->yellow->system->get("coreServerBase").$this->yellow->system->get("coreExtensionLocation");
-                //$output .= "<script type=\"text/javascript\" src=\"{$extensionLocation}lazysizes.min.js\" async=\"\"></script>\n";
+                //$output .= "<script type=\"text/javascript\" src=\"{$extensionLocation}lazysizes.min.js\" defer=\"defer\"></script>\n";
                 $output .= "<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js\" defer=\"defer\"></script>\n";
         }
         return $output;
