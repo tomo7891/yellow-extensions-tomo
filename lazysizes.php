@@ -16,8 +16,8 @@ class YellowLazysizes
         $output = null;
         if ($name == 'header') {
                 $extensionLocation = $this->yellow->system->get("coreServerBase").$this->yellow->system->get("coreExtensionLocation");
-                //$output .= "<script type=\"text/javascript\" src=\"{$extensionLocation}lazysizes.min.js\" defer=\"defer\"></script>\n";
-                $output .= "<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js\" defer=\"defer\"></script>\n";
+                $output .= "<script type=\"text/javascript\" defer=\"defer\" src=\"{$extensionLocation}lazysizes.min.js\"></script>\n";
+                //$output .= "<script type=\"text/javascript\" defer=\"defer\" src=\"https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js\"></script>\n";
         }
         return $output;
     }
@@ -28,9 +28,9 @@ class YellowLazysizes
         $text = preg_replace_callback('/<img([^>]*)>/', function ($matches) {
             if(strpos($matches[1],'lazyload') !== false){
             $match = str_replace(' src=', ' data-src=', $matches[1]);
-              return '<img'. $match .'>';
+              return '<img loading="lazy"'. $match .'>';
           }else{
-              return '<img'. $matches[1] .'>';
+              return '<img loading="lazy"'. $matches[1] .'>';
           }
         }, $text);
         return $text;
