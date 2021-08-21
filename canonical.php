@@ -18,9 +18,17 @@ class YellowCanonical {
             $cUrl = $this->yellow->page->getHtml("canonical");
           }else{
             $cUrl = $this->yellow->page->getUrl();
-          }
-          if($this->yellow->extension->get("edit")->editable){
-            $cUrl = str_replace("edit/", "", $cUrl);
+            if($this->yellow->extension->get("edit")->editable){
+              $cUrl = str_replace("edit/", "", $cUrl);
+            }
+            // without www
+            if(strpos($cUrl, "www.")){
+              $cUrl = str_replace("www.", "", $cUrl);
+            }
+            // http to https
+            if(strpos($cUrl, "ttp://")){
+              $cUrl = str_replace("http://", "https://", $cUrl);
+            }
           }
           $output .= "<link rel=\"canonical\" href=\"{$cUrl}\">\n";
         }
