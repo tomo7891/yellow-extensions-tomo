@@ -1,5 +1,4 @@
 <?php
-// Crop extension
 class YellowCrop
 {
     const VERSION = "0.8.10";
@@ -84,7 +83,9 @@ class YellowCrop
           } else {
               list($w, $h) = $this->resize($src, $size);
           }
-          list($src, $width, $height) = $this->yellow->extension->get("image")->getImageInformation($src, $w, $h);
+          if ($this->yellow->extension->isExisting("image")) {
+            list($src, $width, $height) = $this->yellow->extension->get("image")->getImageInformation($src, $w, $h);
+          }
           return $src;
       }
 
