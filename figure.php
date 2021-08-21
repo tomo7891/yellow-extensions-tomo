@@ -1,5 +1,5 @@
 <?php
-// Gallery extension, https://github.com/datenstrom/yellow-extensions/tree/master/source/gallery
+// Figure extension
 
 class YellowFigure {
     const VERSION = "0.8.13";
