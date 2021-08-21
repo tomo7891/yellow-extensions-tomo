@@ -43,6 +43,7 @@ class YellowCrop
           case 'thumb':
           case 'th':
           $length = '150';
+          $site = "thumb";
           break;
         }
             list($w, $h) = $this->yellow->toolbox->detectImageInformation($src);

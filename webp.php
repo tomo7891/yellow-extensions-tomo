@@ -98,7 +98,6 @@ public function get_webp_filename($fileName){
 
 public function get_webp_path($path){
   // remove assets from path and explode
-  $path = str_replace($this->yellow->system->getHtml("webpBasePath").'/media', '', $path);
   $pathArray = explode("/", $path);
   // we start from $cahcePath
   $finalPath = "/media/webp";
@@ -116,12 +115,14 @@ public function convert($srcIn){
   // check cache folder first
   $this->check_cache_folder();
   $src = rawurldecode($srcIn);
+  $bathPath = $this->yellow->system->getHtml("webpBasePath");
+
   // change relative path to absolute path, starting with
   $src = $this->get_absolute_path($src, $_SERVER['REQUEST_URI']);
   $srcMime = '';
   // file path on server, including file name
   $srcServerFile = './' . ltrim($src, '/');
-  $srcServerFile = str_replace($this->yellow->system->getHtml("webpBasePath"),"", $srcServerFile);
+  $srcServerFile = str_replace($bathPath,"", $srcServerFile);
 
 
   if (file_exists($srcServerFile)) {
@@ -134,13 +135,14 @@ public function convert($srcIn){
   if (in_array($srcMime, ['image/jpeg','image/png'])) {
     $filename = pathinfo($src)['basename'];
     $path = pathinfo($src)['dirname'];
+    $path = str_replace($bathPath.'/media', '', $path);
 
     // create new file name and path
     $webpFileName = $this->get_webp_filename($filename);
     $webpPath = $this->get_webp_path($path);
 
     // webp absolute path for src
-    $webpSrc = $this->yellow->system->getHtml("webpBasePath").$webpPath . '/' . $webpFileName;
+    $webpSrc = $bathPath . $webpPath . '/' . $webpFileName;
 
 
     // webp path on server, without file name
