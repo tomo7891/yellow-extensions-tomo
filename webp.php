@@ -98,13 +98,13 @@ public function get_webp_filename($fileName){
 
 public function get_webp_path($path){
   // remove assets from path and explode
-  $pathArray = explode("/", $path);
+  $pathArray = explode("/media", $path);
   // we start from $cahcePath
   $finalPath = "/media/webp";
   // add folder structure to $cachePath
   foreach ($pathArray as $folder) {
     if (!empty($folder)) {
-      $finalPath .= '/' . $folder;
+      $finalPath .= $folder;
     }
   }
   // return final path, startin with /
