@@ -1,5 +1,4 @@
 <?php
-// Shortcuts extension
 class YellowShortcuts
 {
     const VERSION = "0.8.10";
@@ -14,14 +13,32 @@ class YellowShortcuts
     {
         $output = null;
         switch ($name) {
-                case "page": $output = $this->scPage($page, $name, $text); break;
-                case "pages": case "list":   $output = $this->scPages($page, $name, $text); break;
-                case "system": case "setting": $output = $this->scSystem($page, $name, $text); break;
-                case "user": case "account": $output = $this->scUser($page, $name, $text); break;
-                case "language": case "site":  $output = $this->scLanguage($page, $name, $text); break;
-                case "date": $output = $this->scDate($page, $name, $text); break;
-                case "url": $output = $this->scUrl($page, $name, $text); break;
-            }
+            case "page":
+                $output = $this->scPage($page, $name, $text);
+                break;
+            case "pages":
+            case "list":
+                $output = $this->scPages($page, $name, $text);
+                break;
+            case "system":
+            case "setting":
+                $output = $this->scSystem($page, $name, $text);
+                break;
+            case "user":
+            case "account":
+                $output = $this->scUser($page, $name, $text);
+                break;
+            case "language":
+            case "site":
+                $output = $this->scLanguage($page, $name, $text);
+                break;
+            case "date":
+                $output = $this->scDate($page, $name, $text);
+                break;
+            case "url":
+                $output = $this->scUrl($page, $name, $text);
+                break;
+        }
         return $output;
     }
 
@@ -30,7 +47,7 @@ class YellowShortcuts
         $output = null;
         $text = $this->showBBcodes($text);
         return $text;
-      }
+    }
 
     //ショートコード
     //[page key encode]
@@ -42,7 +59,7 @@ class YellowShortcuts
         }
         list($key, $encode) = $this->yellow->toolbox->getTextArguments($text);
         if (empty($encode)) {
-            $encode='false';
+            $encode = 'false';
         }
         if ($encode != 'true') {
             $output = $this->yellow->page->get($key);
@@ -71,7 +88,7 @@ class YellowShortcuts
         $output .= "<ul>";
         foreach ($pages as $page) {
             if ($page->getHtml("status") != 'draft') {
-                $output .= "<li><a href=\"".$page->getlocation(true)."\">".$page->getHtml("title")."</a></li>";
+                $output .= "<li><a href=\"" . $page->getlocation(true) . "\">" . $page->getHtml("title") . "</a></li>";
             }
         }
         $output .= "</ul>";
@@ -84,7 +101,7 @@ class YellowShortcuts
         $output = null;
         list($key, $encode) = $this->yellow->toolbox->getTextArguments($text);
         if (empty($encode)) {
-            $encode='false';
+            $encode = 'false';
         }
         if ($encode != 'true') {
             $output = $this->yellow->system->get($key);
@@ -100,7 +117,7 @@ class YellowShortcuts
         $output = null;
         list($key, $encode) = $this->yellow->toolbox->getTextArguments($text);
         if (empty($encode)) {
-            $encode='false';
+            $encode = 'false';
         }
         if ($encode != 'true') {
             $output = $this->yellow->user->getUser($key);
@@ -116,7 +133,7 @@ class YellowShortcuts
         $output = null;
         list($key, $encode) = $this->yellow->toolbox->getTextArguments($text);
         if (empty($encode)) {
-            $encode='false';
+            $encode = 'false';
         }
         if ($encode != 'true') {
             $output = $this->yellow->language->getText($key);
@@ -132,7 +149,7 @@ class YellowShortcuts
         $output = null;
         list($key, $format, $encode) = $this->yellow->toolbox->getTextArguments($text);
         if (empty($encode)) {
-            $encode='false';
+            $encode = 'false';
         }
         if (empty($format)) {
             $format = "CoreDateFormatMedium";
@@ -148,34 +165,34 @@ class YellowShortcuts
     //[url path title]
     public function scUrl($page, $name, $text)
     {
-      $output = null;
-      $hash = null;
-      list($path,$title) = $this->yellow->toolbox->getTextArguments($text);
-      if(strpos($path,'#'))list($path,$hash) = explode('#',$path);
-      $page = $this->yellow->content->find($path);
-      if(empty($title) && $hash){
-        $title = $hash;
-      }elseif(empty($title)){
-        $title = $page->getHtml("title");
-      }
-      $url = $page->getUrl()."#{$hash}";
-      $output = "<a href=\"{$url}\" title=\"{$title}\">{$title}</a>";
-      return $output;
+        $output = null;
+        $hash = null;
+        list($path, $title) = $this->yellow->toolbox->getTextArguments($text);
+        if (strpos($path, '#')) list($path, $hash) = explode('#', $path);
+        $page = $this->yellow->content->find($path);
+        if (empty($title) && $hash) {
+            $title = $hash;
+        } elseif (empty($title)) {
+            $title = $page->getHtml("title");
+        }
+        $url = $page->getUrl() . "#{$hash}";
+        $output = "<a href=\"{$url}\" title=\"{$title}\">{$title}</a>";
+        return $output;
     }
 
     //BBcode
     //[bb][/bb]
     public function showBBcodes($text)
     {
-    //$text  = htmlspecialchars($text, ENT_QUOTES, 'utf-8');
+        //$text  = htmlspecialchars($text, ENT_QUOTES, 'utf-8');
         // BBcode array
         $find = array(
-        '#<p>\[cite\](.*?)\[/cite\]<\/p>#' //[cite]*[/cite]
-      );
+            '#<p>\[cite\](.*?)\[/cite\]<\/p>#' //[cite]*[/cite]
+        );
         // HTML tags to replace BBcode
         $replace = array(
-        '<cite">$1</cite>'
-      );
+            '<cite">$1</cite>'
+        );
         // Replacing the BBcodes with corresponding HTML tags
         return preg_replace($find, $replace, $text);
     }
