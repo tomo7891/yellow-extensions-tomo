@@ -6,7 +6,7 @@ class YellowCanonical
   const VERSION = "0.8.18";
   public $yellow;         // access to API
 
-  // Handle initialisation
+  // Handle initialization
   public function onLoad($yellow)
   {
     $this->yellow = $yellow;
@@ -16,29 +16,31 @@ class YellowCanonical
   {
     $output = null;
     if ($name == 'header') {
+      $url = 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+      //normalization
+      if(strpos($url, 'www')){
+        $url = str_replace('www.','',$url);
+        header("HTTP/1.1 301 Moved Permanently");
+        header("Location: {$url}");
+        exit;
+      }
+
+      if (empty($_SERVER['HTTPS'])) {
+        header("HTTP/1.1 301 Moved Permanently");
+        header("Location: {$url}");
+        exit;
+      }
+
+      //set canonical url
       if ($this->yellow->page->getHtml("canonical")) {
-        $cUrl = $this->yellow->page->getHtml("canonical");
+        $url = $this->yellow->page->getHtml("canonical");
       } else {
-        $cUrl = $this->yellow->page->getUrl();
         if ($this->yellow->extension->get("edit")->editable) {
-          $cUrl = str_replace("edit/", "", $cUrl);
-        }
-        // without www
-        if (strpos($cUrl, "www.")) {
-          $cUrl = str_replace("www.", "", $cUrl);
-        }
-
-        //with www
-        //if(!strpos($cUrl, "www.")){
-        //  $cUrl = str_replace("://", "://www.", $cUrl);
-        //}
-
-        // http to https
-        if (strpos($cUrl, "ttp://")) {
-          $cUrl = str_replace("http://", "https://", $cUrl);
+          $url = str_replace("edit/", "", $url);
         }
       }
-      $output .= "<link rel=\"canonical\" href=\"{$cUrl}\">\n";
+      $output .= "<link rel=\"canonical\" href=\"{$url}\">\n";
     }
     return $output;
   }
