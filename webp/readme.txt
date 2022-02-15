@@ -1,0 +1,1 @@
+if you use cache please you add some setting to your htaccess file from example.htaccess.
