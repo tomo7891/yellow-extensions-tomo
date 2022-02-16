@@ -78,17 +78,17 @@ class YellowWebp
         }
     }
 
-    public function serve_node($node, $atribute) {
+    public function serve_node($node, $attribute) {
         if ($node->getAttribute('data-webpconverter-exclude') == 1 ||
             $node->getAttribute('data-webpconverter-exclude') == 'on' ||
             $node->getAttribute('data-webpconverter-exclude') == 'yes') {
-            // the attribure data-webpconverter-exclude exists and turned on
+            // the attribute data-webpconverter-exclude exists and turned on
             return;
         }
-        if ($node->getAttribute($atribute)) {
+        if ($node->getAttribute($attribute)) {
         // the attribute exists, we can handle it
-        $src = $node->getAttribute($atribute);
-        $node->setAttribute($atribute, $this->convert($src));
+        $src = $node->getAttribute($attribute);
+        $node->setAttribute($attribute, $this->convert($src));
         }
     }
 
@@ -124,7 +124,7 @@ class YellowWebp
                 $finalPath .= '/' . $folder;
             }
         }
-        // return final path, startin with /
+        // return final path, starting with /
         return '/' . $finalPath;
     }
 
@@ -143,7 +143,7 @@ class YellowWebp
 
         if (file_exists($srcServerFile)) {
         // we set the MIME type as variable to test whether it is supported
-        // if file_exists evaulates to false, then we return original input
+        // if file_exists evaluates to false, then we return original input
             $srcMime = mime_content_type($srcServerFile);
         } else {
             if (defined("DEBUG") && DEBUG>=1) {
@@ -159,7 +159,7 @@ class YellowWebp
             $mime[] = 'image/'.$val;
         }  
         if (!in_array($srcMime, $mime)) {
-            // unsuported MIME type or image does not exist
+            // unsupported MIME type or image does not exist
             // returning original input
             if (defined("DEBUG") && DEBUG>=1) {
                 if ($srcMime == '') {
@@ -186,11 +186,11 @@ class YellowWebp
             // image does not exist or is outdated
             switch ($srcMime) {
                 case 'image/jpeg':
-                    $image =  imagecreatefromjpeg($srcServerFile);
+                    $image = @imagecreatefromjpeg($srcServerFile);
                     imagepalettetotruecolor($image);
                     break;
                 case 'image/png':
-                    $image =  imagecreatefrompng($srcServerFile);
+                    $image = @imagecreatefrompng($srcServerFile);
                     imagepalettetotruecolor($image);
                     imagealphablending($image, true);
                     imagesavealpha($image, true);
