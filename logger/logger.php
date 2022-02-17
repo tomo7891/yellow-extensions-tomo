@@ -9,9 +9,9 @@ class YellowLogger {
     public function onLoad($yellow) {
         $this->yellow = $yellow;
         $this->yellow->system->setDefault("noImage", "noimage.png");
-        $this->yellow->system->setDefault("loggerRedirectsFile", "yellow-redirects.ini");
         $this->yellow->system->setDefault("loggerErrorFile", "yellow-error.log");
         $this->yellow->system->setDefault("loggerAccessFile", "yellow-access.log");
+        $this->yellow->system->setDefault("loggerRedirectsFile", "yellow-redirects.ini");
     }
 
     public function onParsePageOutput($page, $text) {
@@ -45,7 +45,7 @@ class YellowLogger {
                 }
             }
         }
-        //301Redirect    
+        //301Redirects    
         if(file_exists($extensionDirectory.$this->yellow->system->get("loggerRedirectsFile"))) {
             $list = $this->yellow->toolbox->readFile($extensionDirectory.$this->yellow->system->get("loggerRedirectsFile"));
             $list = str_replace(array("\r\n", "\r", "\n"), "\n", $list);
@@ -68,23 +68,74 @@ class YellowLogger {
     public function onCommand($command, $text) {
         $statusCode = 0;
         $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
-        list($target) = $this->yellow->toolbox->getTextArguments($text);
-        if ($command=="reset") {
-            if($target == "accesslog") {
-                if(file_exists($extensionDirectory.$this->yellow->system->get("loggerAccessFile"))) {
-                    file_put_contents($extensionDirectory.$this->yellow->system->get("loggerAccessFile"),'');
-                    echo "Yellow $command: Reset your access log\n";
+        $accessLog = $extensionDirectory.$this->yellow->system->get("loggerAccessFile");
+        $errorLog = $extensionDirectory.$this->yellow->system->get("loggerErrorFile");
+        $redirects = $extensionDirectory.$this->yellow->system->get("loggerRedirectsFile");
+        list($action, $target) = $this->yellow->toolbox->getTextArguments($text);
+        if ($command=="logger") {
+            if($action == "clean") {
+                if($target == "all") {
+                    if(file_exists($accessLog)) {
+                        file_put_contents($accessLog,'');
+                        echo "Yellow $command: Clean your access log\n";
+                    }
+                    if(file_exists($errorLog)) {
+                        file_put_contents($errorLog,'');
+                        echo "Yellow $command: Clean your error log\n";
+                    }
                     $statusCode = 200;
                 }
+                elseif($target == "access") {
+                    if(file_exists($accessLog)) {
+                        file_put_contents($accessLog,'');
+                        echo "Yellow $command: Clean your access log\n";
+                        $statusCode = 200;
+                    }
+                }
+                elseif($target == "error") {
+                    if(file_exists($errorLog)) {
+                        file_put_contents($errorLog,'');
+                        echo "Yellow $command: Clean your error log\n";
+                        $statusCode = 200;
+                    }
+                }else{
+                    echo "logger clean access\n";
+                    echo "logger clean error\n";
+                    echo "logger clean all\n";
+
+                }
             }
-            if($target == "errorlog") {
-                if(file_exists($extensionDirectory.$this->yellow->system->get("loggerErrorFile"))) {
-                    file_put_contents($extensionDirectory.$this->yellow->system->get("loggerErrorFile"),'');
-                    echo "Yellow $command: Reset your error log\n";
-                    $statusCode = 200;
+            if($action == "show") {
+                if($target == "access") {
+                    if(file_exists($accessLog)) {
+                        echo $this->yellow->toolbox->readFile($accessLog);
+                        $statusCode = 200;
+                    }
+                }
+                elseif($target == "error") {
+                    if(file_exists($accessLog)) {
+                        echo $this->yellow->toolbox->readFile($errorLog);
+                        $statusCode = 200;
+                    }
+                }
+                elseif($target == "redirects") {
+                    if(file_exists($accessLog)) {
+                        echo $this->yellow->toolbox->readFile($redirects);
+                        $statusCode = 200;
+                    }
+                }
+                else{
+                    echo "logger show access\n";
+                    echo "logger show error\n";
+                    echo "logger show redirects\n";
                 }
             }
         }
         return $statusCode;
+    }
+    // Handle command help
+    public function onCommandHelp() {
+        $help = "logger [action target]\n";
+        return $help;
     }
 }
