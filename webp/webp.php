@@ -54,6 +54,49 @@ class YellowWebp
         return $output;
     }
 
+    // Handle command
+    public function onCommand($command, $text) {
+        $statusCode = 0;
+        list($action) = $this->yellow->toolbox->getTextArguments($text);
+        $coreMediaDirectory = $this->yellow->system->get("CoreMediaDirectory");
+        $imageDir = explode("/",$this->yellow->system->get("CoreImageDirectory"));
+        $thumbDir = explode("/",$this->yellow->system->get("ImageThumbnailDirectory"));
+        if ($command=="webp") {
+            if($action == "convert") {
+                    $pattern = "(".$imageDir[1]."|".$thumbDir[1].")/.*?.(jpe?g|png)";
+                    $files = $this->yellow->media->index(true, true)->match("#$coreMediaDirectory$pattern#");
+                    foreach ($files as $file) {
+                        $webp = $this->get_webp_path($file->fileName).".webp";
+                        if(!file_exists(".$webp")){
+                            $this->convert($file->fileName);                        
+                            echo "Success: /$file->fileName => $webp\n";
+                        }
+                    }
+                echo "Finished: convert";
+                $statusCode = 200;
+            }
+            elseif($action == "delete") {
+                $path = "./".$this->yellow->system->get("CoreMediaDirectory").$this->yellow->system->get("webpDirectory");
+                if(file_exists($path)){                                 
+                    $this->yellow->toolbox->deleteDirectory($path);
+                    echo "Success: delete webp Directory";
+                } else {
+                    echo "Error: no exists webp directory";
+                }
+                $statusCode = 200;
+            }else{
+                echo "webp convert\n";
+                echo "webp delete\n";
+            }
+        }
+        return $statusCode;
+    }
+
+    // Handle command help
+    public function onCommandHelp() {
+        return "webp [action]\n";
+    }
+
     public function basic_checks() {
         if (!function_exists('mime_content_type')) {
             $this->yellow->log('error', 'PHP function mime_content_type does not exist.', 'WebP Converter - function does not exist');
@@ -111,7 +154,7 @@ class YellowWebp
     }
 
     public function get_webp_path($path) {
-        // remove assets from path and explode
+        // remove media from path and explode
         $path = str_replace('media', '', $path);
         $pathArray = explode('/', $path);
 
@@ -136,6 +179,9 @@ class YellowWebp
 
         $src = rawurldecode($srcIn);
         // change relative path to absolute path, starting with /
+        if (!isset($_SERVER['REQUEST_URI'])) {
+            $_SERVER['REQUEST_URI'] = substr($_SERVER['PHP_SELF'],1 );
+        }
         $src = $this->get_absolute_path($src, $_SERVER['REQUEST_URI']);
 
         // file path on server, including file name
