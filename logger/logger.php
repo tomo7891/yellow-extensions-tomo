@@ -8,7 +8,6 @@ class YellowLogger {
     // Handle initialization
     public function onLoad($yellow) {
         $this->yellow = $yellow;
-        $this->yellow->system->setDefault("noImage", "noimage.png");
         $this->yellow->system->setDefault("loggerErrorFile", "yellow-error.log");
         $this->yellow->system->setDefault("loggerAccessFile", "yellow-access.log");
         $this->yellow->system->setDefault("loggerRedirectsFile", "yellow-redirects.ini");
@@ -23,13 +22,13 @@ class YellowLogger {
             $l = "-";
             $u = "-";
             $t = date("Y/m/d H:i:s");
-            $m = $_SERVER['REQUEST_METHOD'];
-            $uri = $_SERVER["REQUEST_URI"];
-            $prot = $_SERVER["SERVER_PROTOCOL"];
+            $m = !empty($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : "-";
+            $uri = !empty($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : "-";
+            $prot = !empty($_SERVER["SERVER_PROTOCOL"]) ? $_SERVER["SERVER_PROTOCOL"] : "-";
             $s = $page->getStatusCode();
             $b = strlen($text);
             $ref = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "-";
-            $ua = $_SERVER['HTTP_USER_AGENT'];
+            $ua = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "-";
             $line = "{$h} {$l} {$u} [{$t}] \"{$m} {$uri} {$prot}\" {$s} {$b} \"{$ref}\" \"{$ua}\"";
             $this->yellow->toolbox->appendFile($extensionDirectory.$this->yellow->system->get("loggerAccessFile"), $line."\n");
         }
@@ -74,7 +73,7 @@ class YellowLogger {
         list($action, $target) = $this->yellow->toolbox->getTextArguments($text);
         if ($command=="logger") {
             if($action == "clean") {
-                if($target == "all") {
+                if($target == "both" || $target == "-b") {
                     if(file_exists($accessLog)) {
                         file_put_contents($accessLog,'');
                         echo "Yellow $command: Clean your access log\n";
@@ -85,49 +84,49 @@ class YellowLogger {
                     }
                     $statusCode = 200;
                 }
-                elseif($target == "access") {
+                elseif($target == "access" || $target == "-a") {
                     if(file_exists($accessLog)) {
                         file_put_contents($accessLog,'');
                         echo "Yellow $command: Clean your access log\n";
                         $statusCode = 200;
                     }
                 }
-                elseif($target == "error") {
+                elseif($target == "error" || $target == "-e") {
                     if(file_exists($errorLog)) {
                         file_put_contents($errorLog,'');
                         echo "Yellow $command: Clean your error log\n";
                         $statusCode = 200;
                     }
                 }else{
-                    echo "logger clean access\n";
-                    echo "logger clean error\n";
-                    echo "logger clean all\n";
+                    echo "logger clean [access or -a]\n";
+                    echo "logger clean [error or -e]\n";
+                    echo "logger clean [both or -b]\n";
 
                 }
             }
             if($action == "show") {
-                if($target == "access") {
+                if($target == "access" || $target == "-a") {
                     if(file_exists($accessLog)) {
                         echo $this->yellow->toolbox->readFile($accessLog);
                         $statusCode = 200;
                     }
                 }
-                elseif($target == "error") {
+                elseif($target == "error" || $target == "-e") {
                     if(file_exists($accessLog)) {
                         echo $this->yellow->toolbox->readFile($errorLog);
                         $statusCode = 200;
                     }
                 }
-                elseif($target == "redirects") {
+                elseif($target == "redirects" || $target == "-r") {
                     if(file_exists($accessLog)) {
                         echo $this->yellow->toolbox->readFile($redirects);
                         $statusCode = 200;
                     }
                 }
                 else{
-                    echo "logger show access\n";
-                    echo "logger show error\n";
-                    echo "logger show redirects\n";
+                    echo "logger show [access or -a]\n";
+                    echo "logger show [error or -e]\n";
+                    echo "logger show [redirects or -r]\n";
                 }
             }
         }

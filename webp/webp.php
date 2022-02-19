@@ -62,7 +62,7 @@ class YellowWebp
         $imageDir = explode("/",$this->yellow->system->get("CoreImageDirectory"));
         $thumbDir = explode("/",$this->yellow->system->get("ImageThumbnailDirectory"));
         if ($command=="webp") {
-            if($action == "convert") {
+            if($action == "convert" || $action == "-c") {
                     $pattern = "(".$imageDir[1]."|".$thumbDir[1].")/.*?.(jpe?g|png)";
                     $files = $this->yellow->media->index(true, true)->match("#$coreMediaDirectory$pattern#");
                     foreach ($files as $file) {
@@ -75,7 +75,7 @@ class YellowWebp
                 echo "Finished: convert";
                 $statusCode = 200;
             }
-            elseif($action == "delete") {
+            elseif($action == "delete" || $action == "-d") {
                 $path = "./".$this->yellow->system->get("CoreMediaDirectory").$this->yellow->system->get("webpDirectory");
                 if(file_exists($path)){                                 
                     $this->yellow->toolbox->deleteDirectory($path);
@@ -85,8 +85,8 @@ class YellowWebp
                 }
                 $statusCode = 200;
             }else{
-                echo "webp convert\n";
-                echo "webp delete\n";
+                echo "webp [convert or -c]\n";
+                echo "webp [delete or -d]\n";
             }
         }
         return $statusCode;
