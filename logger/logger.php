@@ -72,7 +72,7 @@ class YellowLogger {
         $redirects = $extensionDirectory.$this->yellow->system->get("loggerRedirectsFile");
         list($action, $target) = $this->yellow->toolbox->getTextArguments($text);
         if ($command=="logger") {
-            if($action == "clean") {
+            if($action == "clean" || $action == "-c") {
                 if($target == "both" || $target == "-b") {
                     if(file_exists($accessLog)) {
                         file_put_contents($accessLog,'');
@@ -98,13 +98,13 @@ class YellowLogger {
                         $statusCode = 200;
                     }
                 }else{
-                    echo "logger clean [access or -a]\n";
-                    echo "logger clean [error or -e]\n";
-                    echo "logger clean [both or -b]\n";
+                    echo "logger clean access\n";
+                    echo "logger clean error\n";
+                    echo "logger clean both\n";
 
                 }
             }
-            if($action == "show") {
+            if($action == "show" || $action == "-s") {
                 if($target == "access" || $target == "-a") {
                     if(file_exists($accessLog)) {
                         echo $this->yellow->toolbox->readFile($accessLog);
@@ -124,9 +124,9 @@ class YellowLogger {
                     }
                 }
                 else{
-                    echo "logger show [access or -a]\n";
-                    echo "logger show [error or -e]\n";
-                    echo "logger show [redirects or -r]\n";
+                    echo "logger show access\n";
+                    echo "logger show error\n";
+                    echo "logger show redirects\n";
                 }
             }
         }
