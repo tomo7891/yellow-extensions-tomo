@@ -20,14 +20,6 @@ class YellowLuminous {
         if ($name == 'header'){          
             $css = "{$extensionLocation}luminous.css";
             $output .= "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"{$css}\" />";
-            $output .= '<style>.lum-img {display:inline-block;}
-            a.zoom {cursor: zoom-in;}
-            @media screen and (max-width: 460px) {
-              .lum-lightbox-inner img {
-                max-width: 160vw !important;
-                max-height: 85vh !important;
-              }
-            }</style>';
         }
         if ($name == 'footer') {          
           $class = $this->yellow->system->get("luminousClass");
