@@ -85,8 +85,8 @@ class YellowWebp
                 }
                 $statusCode = 200;
             }else{
-                echo "webp [convert or -c]\n";
-                echo "webp [delete or -d]\n";
+                echo "webp convert\n";
+                echo "webp delete\n";
             }
         }
         return $statusCode;
