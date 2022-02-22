@@ -25,7 +25,7 @@ class YellowShorter {
             }
         }
         if($redirectLocation){
-            $url = $this->yellow->system->get("coreStaticUrl").$redirectLocation;
+            $url = $this->getAbsoluteUrl().$redirectLocation;
             header("Location: ".$url, true, 301);
             exit();
         }
@@ -37,12 +37,22 @@ class YellowShorter {
                 if(strpos($l, '||')){
                     $r = explode('||',trim($l));
                     if($surlID == trim($r[0])){                        
-                        $url = $this->yellow->system->get("coreStaticUrl").($r[1]);
+                        $url = $this->getAbsoluteUrl().($r[1]);
                         header("Location: ".$url, true, 301);
                         exit();
                     }
                 }   
             }
         }
+    }
+
+    public function getAbsoluteUrl() {
+        if($this->yellow->system->get("coreStaticUrl") == "auto"){
+            $protocol = ($_SERVER["HTTPS"]) ? "https" : "http"; 
+            $output = $protocol.'://' . $_SERVER['HTTP_HOST'];
+        } else {
+            $output = $this->yellow->system->get("coreStaticUrl");
+        }
+        return $output;
     }
 }
