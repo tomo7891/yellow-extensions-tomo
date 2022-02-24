@@ -2,83 +2,78 @@
 // Functions extension
 
 // Return meta data from page blog
-function getMeta($pages, $key) {
-        $data = array();
-        foreach ($pages as $page) {
-            if ($page->isExisting($key)) {
-                foreach (preg_split("/\s*,\s*/", $page->get($key)) as $entry) {
-                    if (!isset($data[$entry])) $data[$entry] = 0;
-                    ++$data[$entry];
-                }
+function getMeta($pages, $key)
+{
+    $data = array();
+    foreach ($pages as $page) {
+        if ($page->isExisting($key)) {
+            foreach (preg_split("/\s*,\s*/", $page->get($key)) as $entry) {
+                if (!isset($data[$entry])) $data[$entry] = 0;
+                ++$data[$entry];
             }
         }
-        return $data;
     }
-
-// Convert KANA
-function searchStr($str='') {
-    if(empty($str))return;
-    $str = strtoloweru($str);
-    $str = mb_convert_kana($str, 'KasCV');
-    return $str;
+    return $data;
 }
 
 //Number Format
 //https://www.php.net/manual/ja/function.number-format.php
-function number($v, $o='')
-    {
-        if(empty($v))return;
-        if (empty($o)) {
-            $o = 0;
-        }
-        return number_format($v, $o);
+function number($v, $o = '')
+{
+    if (empty($v)) return;
+    if (empty($o)) {
+        $o = 0;
     }
+    return number_format($v, $o);
+}
 
 //Summary for Japanese
 //https://reerishun.com/makerblog/?p=779
 function summary($text, $offset, $size, $encoding)
-    {
-        $return_text = "";
-        $offset_cursor = 0;
+{
+    $return_text = "";
+    $offset_cursor = 0;
 
-        for ($i = 0; $i < $offset * 2; $i++) {
-            $char = mb_substr($text, $offset_cursor, 1, $encoding);
-            if (strlen($char) != mb_strlen($char))
-                $i++;
-            $offset_cursor++;
-        }
-
-        for ($i = 0; $i < $size * 2; $i++) {
-            $char = mb_substr($text, $offset_cursor++, 1, $encoding);
-            $return_text = $return_text . $char;
-            if (strlen($char) != mb_strlen($char))
-                $i++;
-        }
-
-        if (mb_strlen($text) > $size) {
-            $return_text = $return_text . "...";
-        }
-
-        return $return_text;
+    for ($i = 0; $i < $offset * 2; $i++) {
+        $char = mb_substr($text, $offset_cursor, 1, $encoding);
+        if (strlen($char) != mb_strlen($char))
+            $i++;
+        $offset_cursor++;
     }
 
+    for ($i = 0; $i < $size * 2; $i++) {
+        $char = mb_substr($text, $offset_cursor++, 1, $encoding);
+        $return_text = $return_text . $char;
+        if (strlen($char) != mb_strlen($char))
+            $i++;
+    }
+
+    if (mb_strlen($text) > $size) {
+        $return_text = $return_text . "...";
+    }
+
+    return $return_text;
+}
+
 //現在のコンテンツ場所
-function isContent($topLocation, $location){
-    if(!$topLocation || !$location)return;
-    if($topLocation == $location) return true;
+function isContent($topLocation, $location)
+{
+    if (!$topLocation || !$location) return;
+    if ($topLocation == $location) return true;
     else return false;
 }
 
 //csv to html
-function csv2html($fileData, $activeHeader){
+function csv2html($fileData, $activeHeader)
+{
     $output = null;
     $list = explode("\n", trim($fileData));
-    if($activeHeader == '1'){
+    if ($activeHeader == '1') {
         $header = explode("|", $list[0]);
         $list = array_slice($list, 1);
         $output .= "<thead><tr>";
         foreach ($header as $h) {
-            $output .= '<th>'.$h.'</th>';
+            $output .= '<th>' . $h . '</th>';
         }
         $output .= "</tr></thead>";
     }
@@ -86,8 +81,8 @@ function csv2html($fileData, $activeHeader){
     foreach ($list as $l) {
         $l = explode("|", $l);
         $output .= "<tr>";
-        foreach ($l as $k => $v){
-            $output .= '<td>'.$v.'</td>';
+        foreach ($l as $k => $v) {
+            $output .= '<td>' . $v . '</td>';
         }
         $output .= "</tr>";
     }
@@ -96,47 +91,49 @@ function csv2html($fileData, $activeHeader){
 }
 
 // from modx evo japanese edition
-function nicesize($size) {
+function nicesize($size)
+{
     $a = array('B', 'KB', 'MB', 'GB', 'TB', 'PB',);
     $pos = 0;
-    while ($size >= 1024){
+    while ($size >= 1024) {
         $size /= 1014;
         $pos++;
-        }
-    return round($size, 2) . ' '. $a[$pos];
+    }
+    return round($size, 2) . ' ' . $a[$pos];
 }
 
 //リサイズ計算
-function resizeImage($src, $size){
+function resizeImage($src, $size)
+{
     if (!empty($src)) {
         if (empty($size)) {
             $size = 'original';
         }
         switch ($size) {
-        case 'xl':
-        case 'll':
-        case '2l':
-            $length = '1024';
-        break;
-        case 'lg':
-        case 'l':
-            $length = '900';
-        break;
-        case 'md':
-        case 'm':
-            $length = '600';
-        break;
-        case 'sm':
-        case 's':
-            $length = '300';
-        break;
-        case 'xs':
-        case 'ss':
-            $length = '150';
-        break;
-        case 'thumb':
-            $length = '150';
-        break;
+            case 'xl':
+            case 'll':
+            case '2l':
+                $length = '1024';
+                break;
+            case 'lg':
+            case 'l':
+                $length = '900';
+                break;
+            case 'md':
+            case 'm':
+                $length = '600';
+                break;
+            case 'sm':
+            case 's':
+                $length = '300';
+                break;
+            case 'xs':
+            case 'ss':
+                $length = '150';
+                break;
+            case 'thumb':
+                $length = '150';
+                break;
         }
         list($w, $h) = getimagesize($src);
         if ($size == 'original' || $size == '100%' || $w < $length || $h < $length) {
@@ -153,7 +150,7 @@ function resizeImage($src, $size){
                 $output[] = round($h * $length / $w);
                 return $output;
             } elseif ($w < $h) {
-                $output[]= round($w * $length / $h);
+                $output[] = round($w * $length / $h);
                 $output[] = $length;
                 return $output;
             } elseif ($w == $h || $size == 'thumb') {
@@ -167,24 +164,24 @@ function resizeImage($src, $size){
 
 //和暦対応年月日
 function datetimeJ($format, $timestamp)
-    {
-        if (!isset($format)) {
-            $format='Y.m.d';
-        }
-        if (!isset($timestamp)) {
-            $timestamp='0000-00-00 00:00';
-        }
-        if (!isset($default)) {
-            $default='';
-        }
-        if (!$timestamp || strpos($timestamp, '0000-00-00')===0) {
-            return $default;
-        }
-        if (!preg_match('@^[0-9]+$@', $timestamp)) {
-            $timestamp = strtotime($timestamp);
-        }
-        return DatetimeUtility::date($format, $timestamp);
+{
+    if (!isset($format)) {
+        $format = 'Y.m.d';
     }
+    if (!isset($timestamp)) {
+        $timestamp = '0000-00-00 00:00';
+    }
+    if (!isset($default)) {
+        $default = '';
+    }
+    if (!$timestamp || strpos($timestamp, '0000-00-00') === 0) {
+        return $default;
+    }
+    if (!preg_match('@^[0-9]+$@', $timestamp)) {
+        $timestamp = strtotime($timestamp);
+    }
+    return DatetimeUtility::date($format, $timestamp);
+}
 
 //CLASS
 //日時用汎用クラス
@@ -245,7 +242,7 @@ class DatetimeUtility
             }
             // 元号が取得できない場合はException
             if (empty($gengo)) {
-                throw new Exception('Can not be converted to a timestamp : '.$timestamp);
+                throw new Exception('Can not be converted to a timestamp : ' . $timestamp);
             }
         }
 
