@@ -13,7 +13,7 @@ class YellowSiteSearch
         $this->yellow->system->setDefault("searchFindLocation", "");
         $this->yellow->system->setDefault("searchLayoutFilter", "");
         $this->yellow->system->setDefault("searchFields", "title+50,description+50,tag+5,author+2");
-        $this->yellow->system->setDefault("searchPluseFields", "");
+        $this->yellow->system->setDefault("searchAddFields", "");
         $this->yellow->system->setDefault("searchFilterSupported", "tag,author,language,status,special");
         $this->yellow->system->setDefault("searchLocation", "/search/");
         $this->yellow->system->setDefault("searchPaginationLimit", "10");
@@ -45,8 +45,8 @@ class YellowSiteSearch
                 if ($searchLayoutFilter) {
                     $spages = $spages->filter("layout", $searchLayoutFilter);
                 }
-                $searchPluseFields = ($page->get("searchPluseFields")) ? $page->get("searchPluseFields") : $this->yellow->system->get("searchPluseFields");
-                $fields = $this->yellow->system->get("searchFields") . ',' . $searchPluseFields;
+                $searchAddFields = ($page->get("searchAddFields")) ? $page->get("searchAddFields") : $this->yellow->system->get("searchAddFields");
+                $fields = $this->yellow->system->get("searchFields") . ',' . $searchAddFields;
                 $searchFields = array();
                 $searchFields = explode(',',  $fields);
                 foreach ($spages as $pageSearch) {
