@@ -2,7 +2,7 @@
 
 class YellowPhpinfo
 {
-    const VERSION = "0.8.14";
+    const VERSION = "0.8.19";
     public $yellow;         // access to API
 
     // Handle initialisation
