@@ -1,1 +1,1 @@
-<?php if ($this->yellow->extension->get("edit")->editable) return phpinfo() ?>
+<?php if($this->yellow->user->getUserHtml("status") == "active") return phpinfo() ?>
