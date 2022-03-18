@@ -1,0 +1,4 @@
+---
+Title: phpinfo
+Layout: phpinfo
+---
