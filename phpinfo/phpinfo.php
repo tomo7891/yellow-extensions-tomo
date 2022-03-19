@@ -21,7 +21,7 @@ class YellowPhpinfo
     public function onParsePageLayout($page, $name)
     {
         if ($this->yellow->page->get("layout") == "phpinfo") {
-            if ($this->yellow->user->getUserHtml("status") != "active") {
+            if (!$this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
                 $this->yellow->page->error(404);
             }
         }

@@ -1,4 +1,4 @@
-<?php if($this->yellow->user->getUserHtml("status") == "active"): ?>
+<?php if($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))): ?>
 <style>
     .tc {
         text-align: center;
