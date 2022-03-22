@@ -10,10 +10,7 @@ class YellowSiteSearch
     public function onLoad($yellow)
     {
         $this->yellow = $yellow;
-        $this->yellow->system->setDefault("searchFindLocation", "");
-        $this->yellow->system->setDefault("searchLayoutFilter", "");
         $this->yellow->system->setDefault("searchFields", "title+50,description+50,tag+5,author+2");
-        $this->yellow->system->setDefault("searchAddFields", "");
         $this->yellow->system->setDefault("searchFilterSupported", "tag,author,language,status,special");
         $this->yellow->system->setDefault("searchLocation", "/search/");
         $this->yellow->system->setDefault("searchPaginationLimit", "10");
@@ -22,7 +19,7 @@ class YellowSiteSearch
     // Handle page layout
     public function onParsePageLayout($page, $name)
     {
-        if (strpos($name, "search") !== false) {
+        if ($name == "search") {
             $searchLocation = ($page->get("searchLocation")) ? $page->get("searchLocation") : $this->yellow->system->get("searchLocation");
             $page->set("searchLocation", $searchLocation);
             $searchPaginationLimit = ($page->get("searchPaginationLimit")) ? $page->get("searchPaginationLimit") : $this->yellow->system->get("searchPaginationLimit");
@@ -35,18 +32,20 @@ class YellowSiteSearch
             if (!empty($tokens) || !empty($filters)) {
                 $pages = $this->yellow->content->clean();
                 $showInvisible = $this->yellow->getRequestHandler() == "edit" && isset($filters["status"]) && ($filters["status"] == "private" || $filters["status"] == "draft" || $filters["status"] == "unlisted");
-                $searchFindLocation = ($page->get("searchFindLocation")) ? $page->get("searchFindLocation") : $this->yellow->system->get("searchFindLocation");
-                if ($searchFindLocation) {
-                    $spages = $this->yellow->content->find($searchFindLocation)->getChildren($showInvisible);
+                if ($page->get("searchFindLocation")) {
+                    $spages = $this->yellow->content->find($page->get("searchFindLocation"))->getChildren($showInvisible);
                 } else {
                     $spages = $this->yellow->content->index($showInvisible, false);
                 }
-                $searchLayoutFilter = ($page->get("searchLayoutFilter")) ? $page->get("searchLayoutFilter") : $this->yellow->system->get("searchLayoutFilter");
-                if ($searchLayoutFilter) {
-                    $spages = $spages->filter("layout", $searchLayoutFilter);
+                if ($page->get("searchFilterKey") && $page->get("searchFilterValue")) {
+                    $spages = $spages->filter($page->get("searchFilterKey"), $page->get("searchFilterValue"));
                 }
-                $searchAddFields = ($page->get("searchAddFields")) ? $page->get("searchAddFields") : $this->yellow->system->get("searchAddFields");
-                $fields = $this->yellow->system->get("searchFields") . ',' . $searchAddFields;
+
+                $addFields = null;
+                if ($page->get("searchAddFields")) {
+                    $addFields =  ',' . $page->get("searchAddFields");
+                }
+                $fields = $this->yellow->system->get("searchFields") . $addFields;
                 $searchFields = array();
                 $searchFields = explode(',',  $fields);
                 foreach ($spages as $pageSearch) {
@@ -115,6 +114,6 @@ class YellowSiteSearch
 
     public function searchStr($str)
     {
-        return mb_convert_kana($str, 'KAsC');
+        return mb_convert_kana(strtoloweru($str), 'KAsC');
     }
 }
