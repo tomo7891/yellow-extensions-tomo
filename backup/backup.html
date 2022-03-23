@@ -1,0 +1,22 @@
+<?php $this->yellow->layout("header") ?>
+<?php echo $this->yellow->page->getContent() ?>
+<h2>Select Backup Directory</h2>
+<form id="backupform" action="<?php echo $this->yellow->page->getUrl(true) ?>" method="get">
+<div>
+<label for="all"><input type="checkbox" id="all"<?php echo ($this->yellow->page->getRequest("content") && $this->yellow->page->getRequest("system") && $this->yellow->page->getRequest("media")) ? " checked" : "" ?>> Check All / Uncheck All</label>
+</div>
+<div>
+<p>
+<label for="content"><input name="content" class="backup" id="content" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("content") ? " checked" : "" ?>> /content</label>
+</p>
+<p>
+<label for="system"><input name="system" class="backup" id="system" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("system") ? " checked" : "" ?>> /system</label>
+</p>
+<p>
+<label for="media"><input name="media" class="backup" id="media" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("media") ? " checked" : "" ?>> /media</label>
+</p>
+</div>
+<input type="submit" value="Backup!">
+<input type="hidden" name="clean-url" />
+</form>
+<?php $this->yellow->layout("footer") ?>
