@@ -33,7 +33,7 @@ class YellowBackup
             if (count($files) > 0) {
                 $output .= "<ul>";
                 foreach ($files as $file) {
-                    $output .= "<li><a href=\"" . $file . "\" download>" . $file . " (" . nicesize(filesize("./" . $this->yellow->system->get("backupDirectory") . $file)) . ")</a></li>";
+                    $output .= "<li><a href=\"" . $file . "\" download>" . $file . " (" . $this->nicesize(filesize("./" . $this->yellow->system->get("backupDirectory") . $file)) . ")</a></li>";
                 }
                 $output .= "</ul>";
             } else {
@@ -139,5 +139,16 @@ class YellowBackup
             }
         }
         closedir($dh);
+    }
+
+    public function nicesize($size)
+    {
+        $a = array('B', 'KB', 'MB', 'GB', 'TB', 'PB',);
+        $pos = 0;
+        while ($size >= 1024) {
+            $size /= 1014;
+            $pos++;
+        }
+        return round($size, 2) . ' ' . $a[$pos];
     }
 }
