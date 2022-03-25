@@ -29,11 +29,11 @@ class YellowBackup
             $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}.submit input{margin-right:1rem;}</style>";
         }
         if ($name == "backuplist") {
-            $files = $this->yellow->toolbox->getDirectoryEntries("./system/backup/", "/.*/", true, false, false);
+            $files = $this->yellow->toolbox->getDirectoryEntries("./" . $this->yellow->system->get("backupDirectory"), "/.*/", true, false, false);
             if (count($files) > 0) {
                 $output .= "<ul>";
                 foreach ($files as $file) {
-                    $output .= "<li><a href=\"" . $file . "\" download>" . $file . " (" . nicesize(filesize("./system/backup/" . $file)) . ")</a></li>";
+                    $output .= "<li><a href=\"" . $file . "\" download>" . $file . " (" . nicesize(filesize("./" . $this->yellow->system->get("backupDirectory") . $file)) . ")</a></li>";
                 }
                 $output .= "</ul>";
             } else {
@@ -48,7 +48,7 @@ class YellowBackup
         if ($name == "backup") {
             if ($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
                 $request = $this->yellow->toolbox->getServer("REQUEST_URI");
-                $request = str_replace("/manager/backup/", "", $request);
+                $request = str_replace($this->yellow->page->getLocation(true), "", $request);
                 if ($request) {
                     $request = explode("/", trim($request, "/"));
                     $content = $media = $system = array();
