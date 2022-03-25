@@ -2,9 +2,6 @@
 <?php echo $this->yellow->page->getContent() ?>
 <h2>Select Backup Directory</h2>
 <form id="backupform" action="<?php echo $this->yellow->page->getUrl(true) ?>" method="get">
-<div>
-<label for="all"><input type="checkbox" id="all"<?php echo ($this->yellow->page->getRequest("content") && $this->yellow->page->getRequest("system") && $this->yellow->page->getRequest("media")) ? " checked" : "" ?>> Check All / Uncheck All</label>
-</div>
 <div class="directory">
 <label for="all_content"><input name="content" class="backup" id="all_content" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("content") ? " checked" : "" ?>> /content (ALL)</label>
 </div>

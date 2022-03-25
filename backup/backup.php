@@ -5,7 +5,6 @@
 // TODO: exclude files
 // TODO: backup List
 // TODO: backup Limit
-// TODO: select Directory
 
 class YellowBackup
 {
@@ -16,6 +15,7 @@ class YellowBackup
     public function onLoad($yellow)
     {
         $this->yellow = $yellow;
+        $this->yellow->system->setDefault("backupDirectory", "system/backup/");
     }
 
     // Handle page meta data
@@ -31,7 +31,6 @@ class YellowBackup
         if ($name == "header" && $page->get("layout") == "backup") {
             $extensionLocation = $this->yellow->system->get("coreServerBase") . $this->yellow->system->get("coreExtensionLocation");
             $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}</style>";
-            $output .= "<script type=\"text/javascript\" defer=\"defer\" src=\"{$extensionLocation}backup.js\"></script>\n";
         }
         return $output;
     }
@@ -45,7 +44,8 @@ class YellowBackup
                 if ($request) {
                     $request = explode("/", trim($request, "/"));
                     $content = $media = $system = array();
-                    $backupDirectory = "./system/backup/" . date("Y-m-d-h-i-s") . "/";
+                    $backupDirectory = "./" . $this->yellow->system->get("backupDirectory");
+                    $backupDirectory = $backupDirectory . date("Y-m-d-h-i-s") . "/";
                     $k = $v = null;
                     foreach ($request as $key => $value) {
                         list($k, $v) = explode("=", $value);
@@ -60,36 +60,17 @@ class YellowBackup
                             $system[] = "./" . $k;
                         }
                     }
-                    if (count($content) > 0) {
-                        foreach ($content as $c) {
-                            if ($c == "./content") {
-                                $this->copyProcessor($page, $c, $backupDirectory);
-                                break;
-                            } else {
-                                $this->copyProcessor($page, $c, $backupDirectory);
-                                continue;
-                            }
-                        }
-                    }
-                    if (count($media) > 0) {
-                        foreach ($media as $m) {
-                            if ($m == "./media") {
-                                $this->copyProcessor($page, $m, $backupDirectory);
-                                break;
-                            } else {
-                                $this->copyProcessor($page, $m, $backupDirectory);
-                                continue;
-                            }
-                        }
-                    }
-                    if (count($system) > 0) {
-                        foreach ($system as $s) {
-                            if ($s == "./system") {
-                                $this->copyProcessor($page, $s, $backupDirectory);
-                                break;
-                            } else {
-                                $this->copyProcessor($page, $s, $backupDirectory);
-                                continue;
+                    $backupFolders = ['content' => $content, 'media' => $media, 'system' => $system];
+                    foreach ($backupFolders as $folder => $array) {
+                        if (count($array) > 0) {
+                            foreach ($array as $a) {
+                                if ($a == "./" . $folder) {
+                                    $this->copyProcessor($page, "./" . $a, $backupDirectory);
+                                    break;
+                                } else {
+                                    $this->copyProcessor($page, "./" . $a, $backupDirectory);
+                                    continue;
+                                }
                             }
                         }
                     }
