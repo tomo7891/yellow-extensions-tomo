@@ -5,18 +5,61 @@
 <div>
 <label for="all"><input type="checkbox" id="all"<?php echo ($this->yellow->page->getRequest("content") && $this->yellow->page->getRequest("system") && $this->yellow->page->getRequest("media")) ? " checked" : "" ?>> Check All / Uncheck All</label>
 </div>
-<div>
-<p>
-<label for="content"><input name="content" class="backup" id="content" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("content") ? " checked" : "" ?>> /content</label>
-</p>
-<p>
-<label for="system"><input name="system" class="backup" id="system" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("system") ? " checked" : "" ?>> /system</label>
-</p>
-<p>
-<label for="media"><input name="media" class="backup" id="media" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("media") ? " checked" : "" ?>> /media</label>
-</p>
+<div class="directory">
+<label for="all_content"><input name="content" class="backup" id="all_content" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("content") ? " checked" : "" ?>> /content (ALL)</label>
 </div>
+<?php 
+$i = 0;
+$directories = $this->yellow->toolbox->getDirectoryEntriesRecursive("./content", "/.*/", true, true, 1);
+foreach($directories as $directory) {
+    echo '<div class="subdirectory"><label for="content_'.str_replace("./content/", "", $directory).'">';
+    echo '<input name="content_'.str_replace("./content/", "", $directory).'" class="backup backup_content" id="content_'.str_replace("./content/", "", $directory).'" type="checkbox" value="1"';
+    echo $this->yellow->page->getRequest("content_".str_replace("./content/", "", $directory)) ? " checked" : "";
+    echo '> ' . str_replace("./content", "", $directory);
+    echo "</label></div>";
+    $i ++;
+}
+?>
+<div class="directory">
+<label for="all_media"><input name="media" class="backup" id="all_media" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("media") ? " checked" : "" ?>> /media (ALL)</label>
+</div>
+<?php 
+$directories = $this->yellow->toolbox->getDirectoryEntriesRecursive("./media", "/.*/", true, true, 1);
+foreach($directories as $directory) {
+    echo '<div class="subdirectory"><label for="media_'.str_replace("./media/", "", $directory).'">';
+    echo '<input name="media_'.str_replace("./media/", "", $directory).'" class="backup backup_media" id="media_'.str_replace("./media/", "", $directory).'" type="checkbox" value="1"';
+    echo $this->yellow->page->getRequest("media_".str_replace("./media/", "", $directory)) ? " checked" : "";
+    echo '> ' . str_replace("./media", "", $directory);
+    echo "</label></div>";
+}
+?>
+<div class="directory">
+<label for="all_system"><input name="system" class="backup" id="all_system" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("system") ? " checked" : "" ?>> /system (ALL)</label>
+</div>
+<?php 
+$directories = $this->yellow->toolbox->getDirectoryEntriesRecursive("./system", "/.*/", true, true, 1);
+foreach($directories as $directory) {
+    if($directory != "./system/backup"){
+    echo '<div class="subdirectory"><label for="system_'.str_replace("./system/", "", $directory).'">';
+    echo '<input name="system_'.str_replace("./system/", "", $directory).'" class="backup backup_system" id="system_'.str_replace("./system/", "", $directory).'" type="checkbox" value="1"';
+    echo $this->yellow->page->getRequest("system_".str_replace("./system/", "", $directory)) ? " checked" : "";
+    echo '> ' . str_replace("./system", "", $directory);
+    echo "</label></div>";
+    }
+}
+?>
+<div class="submit">
 <input type="submit" value="Backup!">
+</div>
 <input type="hidden" name="clean-url" />
 </form>
+
+<nav class="pagenav">
+<?php if($this->yellow->page->getParentTop(true)->get("titleSlug")=="school") :?>
+<?php echo $this->yellow->page->getExtra("schoolNav") ?>
+<?php else :?>
+<?php echo $this->yellow->page->getExtra("toParent") ?>
+<?php endif ?>
+<?php echo $this->yellow->page->getExtra("toTop") ?>
+</nav>
 <?php $this->yellow->layout("footer") ?>

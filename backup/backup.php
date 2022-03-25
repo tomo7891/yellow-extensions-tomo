@@ -5,6 +5,7 @@
 // TODO: exclude files
 // TODO: backup List
 // TODO: backup Limit
+// TODO: select Directory
 
 class YellowBackup
 {
@@ -29,7 +30,7 @@ class YellowBackup
         $output = null;
         if ($name == "header" && $page->get("layout") == "backup") {
             $extensionLocation = $this->yellow->system->get("coreServerBase") . $this->yellow->system->get("coreExtensionLocation");
-            $output .= "<style>#backupform label {cursor:pointer;}</style>";
+            $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}</style>";
             $output .= "<script type=\"text/javascript\" defer=\"defer\" src=\"{$extensionLocation}backup.js\"></script>\n";
         }
         return $output;
@@ -37,44 +38,74 @@ class YellowBackup
 
     public function onParsePageLayout($page, $name)
     {
-        if ($name = "backup") {
-            if (!$this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
+        if ($name == "backup") {
+            if ($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
+                $request = $this->yellow->toolbox->getServer("REQUEST_URI");
+                $request = str_replace("/manager/backup/", "", $request);
+                if ($request) {
+                    $request = explode("/", trim($request, "/"));
+                    $content = $media = $system = array();
+                    $backupDirectory = "./system/backup/" . date("Y-m-d-h-i-s") . "/";
+                    $k = $v = null;
+                    foreach ($request as $key => $value) {
+                        list($k, $v) = explode("=", $value);
+                        $k = str_replace("_", "/", $k);
+                        if (substru($k, 0, 7) == "content") {
+                            $content[] = "./" . $k;
+                        }
+                        if (substru($k, 0, 5) == "media") {
+                            $media[] = "./" . $k;
+                        }
+                        if (substru($k, 0, 6) == "system") {
+                            $system[] = "./" . $k;
+                        }
+                    }
+                    if (count($content) > 0) {
+                        foreach ($content as $c) {
+                            if ($c == "./content") {
+                                $this->copyProcessor($page, $c, $backupDirectory);
+                                break;
+                            } else {
+                                $this->copyProcessor($page, $c, $backupDirectory);
+                                continue;
+                            }
+                        }
+                    }
+                    if (count($media) > 0) {
+                        foreach ($media as $m) {
+                            if ($m == "./media") {
+                                $this->copyProcessor($page, $m, $backupDirectory);
+                                break;
+                            } else {
+                                $this->copyProcessor($page, $m, $backupDirectory);
+                                continue;
+                            }
+                        }
+                    }
+                    if (count($system) > 0) {
+                        foreach ($system as $s) {
+                            if ($s == "./system") {
+                                $this->copyProcessor($page, $s, $backupDirectory);
+                                break;
+                            } else {
+                                $this->copyProcessor($page, $s, $backupDirectory);
+                                continue;
+                            }
+                        }
+                    }
+                }
+            } else {
                 $this->yellow->page->error(404);
             }
-            if ($page->getRequest("content") || $page->getRequest("media") || $page->getRequest("system")) {
-                $backupDirectory = "./system/backup";
-                $backupDirectory = $backupDirectory . "/" . date("Y-m-d-h-i-s");
-                if ($page->getRequest("content")) {
-                    $backupDirectory = $backupDirectory . "_c";
-                }
-                if ($page->getRequest("media")) {
-                    $backupDirectory = $backupDirectory . "_m";
-                }
-                if ($page->getRequest("system")) {
-                    $backupDirectory = $backupDirectory . "_s";
-                }
+        }
+    }
 
-                if ($page->getRequest("content")) {
-                    $path = "./content";
-                    $contents = $this->yellow->toolbox->getDirectoryEntriesRecursive($path, "/.*/", false, false);
-                    foreach ($contents as $content) {
-                        $this->yellow->toolbox->copyFile($content, $backupDirectory . "/" . ltrim($content, './'), true);
-                    }
-                }
-                if ($page->getRequest("media")) {
-                    $path = "./media";
-                    $medias = $this->yellow->toolbox->getDirectoryEntriesRecursive($path, "/.*/", false, false);
-                    foreach ($medias as $media) {
-                        $this->yellow->toolbox->copyFile($media, $backupDirectory . "/" . ltrim($media, './'), true);
-                    }
-                }
-                if ($page->getRequest("system")) {
-                    $path = "./system";
-                    $systems = $this->yellow->toolbox->getDirectoryEntriesRecursive($path, "/.*/", false, false);
-                    foreach ($systems as $system) {
-                        $this->yellow->toolbox->copyFile($system, $backupDirectory . "/" . ltrim($system, './'), true);
-                    }
-                }
+    public function copyProcessor($page, $path, $backupDirectory)
+    {
+        $files = $this->yellow->toolbox->getDirectoryEntriesRecursive($path, "/.*/", false, false);
+        foreach ($files as $file) {
+            if (strpos($file, $backupDirectory) !== true) {
+                $this->yellow->toolbox->copyFile($file, $backupDirectory . ltrim($file, './'), true);
             }
         }
     }
