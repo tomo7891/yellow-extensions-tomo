@@ -1,7 +1,5 @@
 <?php
 // Backup extension
-// TODO: backup List
-// TODO: backup Limit
 
 class YellowBackup
 {
@@ -29,6 +27,18 @@ class YellowBackup
         if ($name == "header" && $page->get("layout") == "backup") {
             $extensionLocation = $this->yellow->system->get("coreServerBase") . $this->yellow->system->get("coreExtensionLocation");
             $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}.submit input{margin-right:1rem;}</style>";
+        }
+        if ($name == "backuplist") {
+            $files = $this->yellow->toolbox->getDirectoryEntries("./system/backup/", "/.*/", true, false, false);
+            if (count($files) > 0) {
+                $output .= "<ul>";
+                foreach ($files as $file) {
+                    $output .= "<li><a href=\"" . $file . "\" download>" . $file . " (" . nicesize(filesize("./system/backup/" . $file)) . ")</a></li>";
+                }
+                $output .= "</ul>";
+            } else {
+                $output .= "<p>No Backup</p>";
+            }
         }
         return $output;
     }
@@ -74,6 +84,8 @@ class YellowBackup
                     }
                     $this->zip($backupDirectory, $backupDirectory . '.zip');
                     $this->yellow->toolbox->deleteDirectory($backupDirectory);
+                    header('Location:' . $this->yellow->page->getLocation(true));
+                    exit;
                 }
                 $backupZipDirectory = "./" . $this->yellow->system->get("backupDirectory");
                 $zips = $this->yellow->toolbox->getDirectoryEntries($backupZipDirectory, "/.*/", true, false, false);
@@ -90,6 +102,7 @@ class YellowBackup
             }
         }
     }
+
 
     public function copyProcessor($page, $path, $backupDirectory)
     {

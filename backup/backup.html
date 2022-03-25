@@ -3,44 +3,38 @@
 <h2>Select Backup Directory</h2>
 <form id="backupform" action="<?php echo $this->yellow->page->getUrl(true) ?>" method="get">
 <div class="directory">
-<label for="all_content"><input name="content" class="backup" id="all_content" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("content") ? " checked" : "" ?>> /content (ALL)</label>
+<label for="all_content"><input name="content" class="backup" id="all_content" type="checkbox" value="1"> /content (ALL)</label>
 </div>
 <?php 
 $i = 0;
 $directories = $this->yellow->toolbox->getDirectoryEntriesRecursive("./content", "/.*/", true, true, 1);
 foreach($directories as $directory) {
     echo '<div class="subdirectory"><label for="content_'.str_replace("./content/", "", $directory).'">';
-    echo '<input name="content_'.str_replace("./content/", "", $directory).'" class="backup backup_content" id="content_'.str_replace("./content/", "", $directory).'" type="checkbox" value="1"';
-    echo $this->yellow->page->getRequest("content_".str_replace("./content/", "", $directory)) ? " checked" : "";
-    echo '> ' . str_replace("./content", "", $directory);
+    echo '<input name="content_'.str_replace("./content/", "", $directory).'" class="backup backup_content" id="content_'.str_replace("./content/", "", $directory).'" type="checkbox" value="1"> ' . str_replace("./content", "", $directory);
     echo "</label></div>";
     $i ++;
 }
 ?>
 <div class="directory">
-<label for="all_media"><input name="media" class="backup" id="all_media" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("media") ? " checked" : "" ?>> /media (ALL)</label>
+<label for="all_media"><input name="media" class="backup" id="all_media" type="checkbox" value="1"> /media (ALL)</label>
 </div>
 <?php 
 $directories = $this->yellow->toolbox->getDirectoryEntriesRecursive("./media", "/.*/", true, true, 1);
 foreach($directories as $directory) {
     echo '<div class="subdirectory"><label for="media_'.str_replace("./media/", "", $directory).'">';
-    echo '<input name="media_'.str_replace("./media/", "", $directory).'" class="backup backup_media" id="media_'.str_replace("./media/", "", $directory).'" type="checkbox" value="1"';
-    echo $this->yellow->page->getRequest("media_".str_replace("./media/", "", $directory)) ? " checked" : "";
-    echo '> ' . str_replace("./media", "", $directory);
+    echo '<input name="media_'.str_replace("./media/", "", $directory).'" class="backup backup_media" id="media_'.str_replace("./media/", "", $directory).'" type="checkbox" value="1"> ' . str_replace("./media", "", $directory);
     echo "</label></div>";
 }
 ?>
 <div class="directory">
-<label for="all_system"><input name="system" class="backup" id="all_system" type="checkbox" value="1"<?php echo $this->yellow->page->getRequest("system") ? " checked" : "" ?>> /system (ALL)</label>
+<label for="all_system"><input name="system" class="backup" id="all_system" type="checkbox" value="1"> /system (ALL)</label>
 </div>
 <?php 
 $directories = $this->yellow->toolbox->getDirectoryEntriesRecursive("./system", "/.*/", true, true, 1);
 foreach($directories as $directory) {
     if($directory != "./system/backup"){
     echo '<div class="subdirectory"><label for="system_'.str_replace("./system/", "", $directory).'">';
-    echo '<input name="system_'.str_replace("./system/", "", $directory).'" class="backup backup_system" id="system_'.str_replace("./system/", "", $directory).'" type="checkbox" value="1"';
-    echo $this->yellow->page->getRequest("system_".str_replace("./system/", "", $directory)) ? " checked" : "";
-    echo '> ' . str_replace("./system", "", $directory);
+    echo '<input name="system_'.str_replace("./system/", "", $directory).'" class="backup backup_system" id="system_'.str_replace("./system/", "", $directory).'" type="checkbox" value="1"> ' . str_replace("./system", "", $directory);
     echo "</label></div>";
     }
 }
@@ -52,15 +46,5 @@ foreach($directories as $directory) {
 <input type="hidden" name="clean-url" />
 </form>
 <h2>Backup List</h2>
-<?php 
-$files = $this->yellow->toolbox->getDirectoryEntries("./system/backup/", "/.*/", true, false, false);
-if(count($files) > 0){
-    echo "<ul>";
-foreach($files as $file) {
-    echo "<li><a href=\"".$file."\" download>".$file." (".nicesize(filesize("./system/backup/".$file)).")</a></li>";
-}
-echo "</ul>";
-}else{
-    echo "No Backup";
-} ?>
+<?php echo $this->yellow->page->getExtra("backuplist") ?>
 <?php $this->yellow->layout("footer") ?>
