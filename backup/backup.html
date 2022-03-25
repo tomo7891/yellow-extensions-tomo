@@ -47,16 +47,20 @@ foreach($directories as $directory) {
 ?>
 <div class="submit">
 <input type="submit" value="Backup!">
+<input type="reset" value="Reset">
 </div>
 <input type="hidden" name="clean-url" />
 </form>
-
-<nav class="pagenav">
-<?php if($this->yellow->page->getParentTop(true)->get("titleSlug")=="school") :?>
-<?php echo $this->yellow->page->getExtra("schoolNav") ?>
-<?php else :?>
-<?php echo $this->yellow->page->getExtra("toParent") ?>
-<?php endif ?>
-<?php echo $this->yellow->page->getExtra("toTop") ?>
-</nav>
+<h2>Backup List</h2>
+<?php 
+$files = $this->yellow->toolbox->getDirectoryEntries("./system/backup/", "/.*/", true, false, false);
+if(count($files) > 0){
+    echo "<ul>";
+foreach($files as $file) {
+    echo "<li><a href=\"".$file."\" download>".$file." (".nicesize(filesize("./system/backup/".$file)).")</a></li>";
+}
+echo "</ul>";
+}else{
+    echo "No Backup";
+} ?>
 <?php $this->yellow->layout("footer") ?>
