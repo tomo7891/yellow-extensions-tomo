@@ -25,15 +25,17 @@ class YellowBackup
     {
         $output = null;
         if ($name == "header" && $page->get("layout") == "backup") {
-            $extensionLocation = $this->yellow->system->get("coreServerBase") . $this->yellow->system->get("coreExtensionLocation");
             $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}.submit input{margin-right:1rem;}</style>";
         }
         if ($name == "backuplist") {
             $files = $this->yellow->toolbox->getDirectoryEntries("./" . $this->yellow->system->get("backupDirectory"), "/.*/", true, false, false);
+            $downloadLocation = $this->yellow->system->get("coreServerBase") . $this->yellow->system->get("coreDownloadLocation");
             if (count($files) > 0) {
                 $output .= "<ul>";
                 foreach ($files as $file) {
-                    $output .= "<li><a href=\"" . $file . "\" download>" . $file . " (" . $this->nicesize(filesize("./" . $this->yellow->system->get("backupDirectory") . $file)) . ")</a></li>";
+                    $download = $downloadLocation . $file;
+                    $backup = "./" . $this->yellow->system->get("backupDirectory") . $file;
+                    $output .= "<li>" . $file . "</a></li>";
                 }
                 $output .= "</ul>";
             } else {
@@ -56,7 +58,11 @@ class YellowBackup
                     $backupDirectory = $backupDirectory . date("Y-m-d-h-i-s");
                     $k = $v = null;
                     foreach ($request as $key => $value) {
-                        list($k, $v) = explode("=", $value);
+                        if (strpos($value, "=")) {
+                            list($k, $v) = explode("=", $value);
+                        } elseif (strpos($value, ":")) {
+                            list($k, $v) = explode(":", $value);
+                        }
                         $k = str_replace("_", "/", $k);
                         if (substru($k, 0, 7) == "content") {
                             $content[] = "./" . $k;
