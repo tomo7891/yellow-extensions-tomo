@@ -28,14 +28,20 @@ class YellowBackup
             $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}.submit input{margin-right:1rem;}</style>";
         }
         if ($name == "backuplist") {
-            $files = $this->yellow->toolbox->getDirectoryEntries("./" . $this->yellow->system->get("backupDirectory"), "/.*/", true, false, false);
-            $downloadLocation = $this->yellow->system->get("coreServerBase") . $this->yellow->system->get("coreDownloadLocation");
+            $protocol = ($_SERVER["HTTPS"]) ? "https" : "http";
+            $host = $protocol . '://' . $_SERVER['HTTP_HOST'];
+            $files = $this->yellow->toolbox->getDirectoryEntries("./" . $this->yellow->system->get("backupDirectory"), "/.*.zip/", true, false, false);
             if (count($files) > 0) {
                 $output .= "<ul>";
                 foreach ($files as $file) {
-                    $download = $downloadLocation . $file;
                     $backup = "./" . $this->yellow->system->get("backupDirectory") . $file;
-                    $output .= "<li>" . $file . "</a></li>";
+                    $output .= "<li>";
+                    if ($host == $this->yellow->system->get("CoreStaticUrl")) {
+                        $output .= "<a href=\"" . $page->getUrl(true) . "download:" . rtrim($file, ".zip") . "/\">" . $file . "</a>";
+                    } else {
+                        $output .= $file;
+                    }
+                    $output .= " </li>";
                 }
                 $output .= "</ul>";
             } else {
@@ -47,7 +53,19 @@ class YellowBackup
 
     public function onParsePageLayout($page, $name)
     {
-        if ($name == "backup") {
+        if ($name == "backup" && $page->getRequest("download")) {
+            if ($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
+                $protocol = ($_SERVER["HTTPS"]) ? "https" : "http";
+                $host = $protocol . '://' . $_SERVER['HTTP_HOST'];
+                if ($host == $this->yellow->system->get("CoreStaticUrl")) {
+                    $file_name = $page->getRequest("download") . '.zip';
+                    $file_path = "./" . $this->yellow->system->get("backupDirectory") . $file_name;
+                    $this->yellow->extension->get("download")->download($file_path, 'application/zip');
+                }
+            } else {
+                $this->yellow->page->error(404);
+            }
+        } elseif ($name == "backup" && !$page->getRequest("download")) {
             if ($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
                 $request = $this->yellow->toolbox->getServer("REQUEST_URI");
                 $request = str_replace($this->yellow->page->getLocation(true), "", $request);
@@ -145,16 +163,5 @@ class YellowBackup
             }
         }
         closedir($dh);
-    }
-
-    public function nicesize($size)
-    {
-        $a = array('B', 'KB', 'MB', 'GB', 'TB', 'PB',);
-        $pos = 0;
-        while ($size >= 1024) {
-            $size /= 1014;
-            $pos++;
-        }
-        return round($size, 2) . ' ' . $a[$pos];
     }
 }
