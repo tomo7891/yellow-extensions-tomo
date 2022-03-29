@@ -28,20 +28,18 @@ class YellowBackup
             $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}.submit input{margin-right:1rem;}</style>";
         }
         if ($name == "backuplist") {
-            $protocol = ($_SERVER["HTTPS"]) ? "https" : "http";
-            $host = $protocol . '://' . $_SERVER['HTTP_HOST'];
             $files = $this->yellow->toolbox->getDirectoryEntries("./" . $this->yellow->system->get("backupDirectory"), "/.*.zip/", true, false, false);
             if (count($files) > 0) {
                 $output .= "<ul>";
                 foreach ($files as $file) {
-                    $backup = "./" . $this->yellow->system->get("backupDirectory") . $file;
-                    $output .= "<li>";
-                    if ($host == $this->yellow->system->get("CoreStaticUrl")) {
-                        $output .= "<a href=\"" . $page->getUrl(true) . "download:" . rtrim($file, ".zip") . "/\">" . $file . "</a>";
-                    } else {
-                        $output .= $file;
+                    $hash = $this->yellow->extension->get("download")->searchHash("./" . $this->yellow->system->get("backupDirectory") . $file);
+                    if ($hash) {
+                        $url = $page->getLocation(true) . "download:" . $hash . "/";
+                        $title = basename($file);
+                        $output .= "<li>";
+                        $output .= '<a href="' . $url . '">' . $title . ' (' . nicesize(filesize("./" . $this->yellow->system->get("backupDirectory") . $file)) . ')</a>';
+                        $output .= "</li>";
                     }
-                    $output .= " </li>";
                 }
                 $output .= "</ul>";
             } else {
@@ -55,13 +53,9 @@ class YellowBackup
     {
         if ($name == "backup" && $page->getRequest("download")) {
             if ($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
-                $protocol = ($_SERVER["HTTPS"]) ? "https" : "http";
-                $host = $protocol . '://' . $_SERVER['HTTP_HOST'];
-                if ($host == $this->yellow->system->get("CoreStaticUrl")) {
-                    $file_name = $page->getRequest("download") . '.zip';
-                    $file_path = "./" . $this->yellow->system->get("backupDirectory") . $file_name;
-                    $this->yellow->extension->get("download")->download($file_path, 'application/zip');
-                }
+                $file_name = $page->getRequest("download") . '.zip';
+                $file_path = "./" . $this->yellow->system->get("backupDirectory") . $file_name;
+                $this->yellow->extension->get("download")->download($page, 'application/zip');
             } else {
                 $this->yellow->page->error(404);
             }
@@ -74,6 +68,7 @@ class YellowBackup
                     $content = $media = $system = array();
                     $backupDirectory = "./" . $this->yellow->system->get("backupDirectory");
                     $backupDirectory = $backupDirectory . date("Y-m-d-h-i-s");
+                    $backupFile = $backupDirectory . '.zip';
                     $k = $v = null;
                     foreach ($request as $key => $value) {
                         if (strpos($value, "=")) {
@@ -106,8 +101,9 @@ class YellowBackup
                             }
                         }
                     }
-                    $this->zip($backupDirectory, $backupDirectory . '.zip');
+                    $this->zip($backupDirectory, $backupFile);
                     $this->yellow->toolbox->deleteDirectory($backupDirectory);
+                    $this->yellow->extension->get("download")->addDownloadList($backupFile);
                     header('Location:' . $this->yellow->page->getLocation(true));
                     exit;
                 }
@@ -132,7 +128,7 @@ class YellowBackup
     {
         $files = $this->yellow->toolbox->getDirectoryEntriesRecursive("./" . $path, "/.*/", false, false);
         foreach ($files as $file) {
-            if (strpos($file, $backupDirectory) !== true) {
+            if (!strpos($file, $this->yellow->system->get("backupDirectory"))) {
                 $this->yellow->toolbox->copyFile($file, $backupDirectory  . "/" . ltrim($file, './'), true);
             }
         }
