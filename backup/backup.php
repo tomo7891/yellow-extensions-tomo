@@ -10,7 +10,7 @@ class YellowBackup
     public function onLoad($yellow)
     {
         $this->yellow = $yellow;
-        $this->yellow->system->setDefault("backupLocation", "/system/backup/");
+        $this->yellow->system->setDefault("backupLocation", "backup/");
         $this->yellow->system->setDefault("backupLimit", "5");
     }
 
@@ -28,16 +28,18 @@ class YellowBackup
             $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}.submit input{margin-right:1rem;}</style>";
         }
         if ($name == "backuplist") {
-            $files = $this->yellow->toolbox->getDirectoryEntries("." . $this->yellow->system->get("backupLocation"), "/.*.zip/", true, false, false);
+            $coreSystemDirectory = $this->yellow->system->get("coreSystemDirectory");
+            $backupLocation = "./" . $coreSystemDirectory . $this->yellow->system->get("backupLocation");
+            $files = $this->yellow->toolbox->getDirectoryEntries($backupLocation, "/.*.zip/", true, false, false);
             if (count($files) > 0) {
                 $output .= "<ul>";
                 foreach ($files as $file) {
-                    $hash = $this->yellow->extension->get("download")->searchHash("." . $this->yellow->system->get("backupLocation") . $file);
+                    $hash = $this->yellow->extension->get("download")->searchHash($backupLocation . $file);
                     if ($hash) {
                         $url = $page->getLocation(true) . "download" . $this->yellow->toolbox->getLocationArgumentsSeparator() . $hash . "/";
                         $title = basename($file);
                         $output .= "<li>";
-                        $output .= '<a href="' . $url . '">' . $title . ' (' . nicesize(filesize("." . $this->yellow->system->get("backupLocation") . $file)) . ')</a>';
+                        $output .= '<a href="' . $url . '">' . $title . ' (' . nicesize(filesize($backupLocation . $file)) . ')</a>';
                         $output .= "</li>";
                     }
                 }
@@ -51,10 +53,12 @@ class YellowBackup
 
     public function onParsePageLayout($page, $name)
     {
+        $coreSystemDirectory = $this->yellow->system->get("coreSystemDirectory");
+        $backupLocation = "./" . $coreSystemDirectory . $this->yellow->system->get("backupLocation");
         if ($name == "backup" && $page->getRequest("download")) {
             if ($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
                 $file_name = $page->getRequest("download") . '.zip';
-                $file_path = "." . $this->yellow->system->get("backupLocation") . $file_name;
+                $file_path = $backupLocation . $file_name;
                 $this->yellow->extension->get("download")->download($page, 'application/zip');
             } else {
                 $this->yellow->page->error(404);
@@ -65,7 +69,6 @@ class YellowBackup
                 if ($request) {
                     $request = explode("/", trim($request, "/"));
                     $content = $media = $system = array();
-                    $backupLocation = "." . $this->yellow->system->get("backupLocation");
                     $backupLocation = $backupLocation . date("Y-m-d-h-i-s");
                     $backupFile = $backupLocation . '.zip';
                     $k = $v = null;
