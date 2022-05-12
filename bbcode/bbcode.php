@@ -3,7 +3,7 @@
 
 class YellowBbcode
 {
-  const VERSION = "0.8.19";
+  const VERSION = "0.8.20";
   public $yellow;         // access to API
 
   // Handle initialization
@@ -12,12 +12,10 @@ class YellowBbcode
     $this->yellow = $yellow;
   }
 
-  public function onParsePageOutput($page, $text)
+  public function onParseContentHtml($page, $text)
   {
     $output = null;
-    if (!$this->yellow->extension->get("edit")->editable) {
-      $output = $this->showBBcodes($text);
-    }
+    $output = $this->showBBcodes($text);
     return $output;
   }
 
@@ -42,16 +40,14 @@ class YellowBbcode
     $find = array(
       '~\[u\](.*?)\[/u\]~s',
       '~\[size=(.*?)\](.*?)\[/size\]~s',
-      '~\[color=(.*?)\](.*?)\[/color\]~s',
-      '~<p>\[cite\](.*?)\[/cite\]</p>~'
+      '~\[color=(.*?)\](.*?)\[/color\]~s'
     );
 
     // HTML tags to replace BBcode
     $replace = array(
       '<u>$1</u>',
       '<span style="font-size:$1px;">$2</span>',
-      '<span style="color:$1;">$2</span>',
-      '<cite>$1</cite>'
+      '<span style="color:$1;">$2</span>'
     );
 
     // Replacing the BBcodes with corresponding HTML tags
