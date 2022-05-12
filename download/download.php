@@ -26,11 +26,13 @@ class YellowDownload
         return $output;
     }
 
+
     public function downloadLink($page, $name, $text)
     {
         $output = null;
         $hash = null;
         list($path) = $this->yellow->toolbox->getTextArguments($text);
+        $path = "." . $path;
         if (file_exists($path)) {
             $this->addDownloadList($path);
             $hash = $this->searchHash($path);
@@ -39,6 +41,9 @@ class YellowDownload
             $url = $page->getLocation(true) . "download" . $this->yellow->toolbox->getLocationArgumentsSeparator() . $hash . "/";
             $title = basename($path);
             $output .= '<a href="' . $url . '">' . $title . '</a>';
+        }
+        if ($page->getRequest("download")) {
+            $this->yellow->extension->get("download")->download($page);
         }
         return $output;
     }
