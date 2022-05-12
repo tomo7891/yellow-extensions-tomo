@@ -36,7 +36,7 @@ class YellowDownload
             $hash = $this->searchHash($path);
         }
         if ($hash) {
-            $url = $page->getLocation(true) . "download:" . $hash . "/";
+            $url = $page->getLocation(true) . "download" . $this->yellow->toolbox->getLocationArgumentsSeparator() . $hash . "/";
             $title = basename($path);
             $output .= '<a href="' . $url . '">' . $title . '</a>';
         }
@@ -46,7 +46,7 @@ class YellowDownload
     public function addDownloadList($path)
     {
         $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
-        $downloadList = $extensionDirectory . $this->yellow->system->get("downloadList");
+        $downloadList = './' . $extensionDirectory . $this->yellow->system->get("downloadList");
         if (file_exists($downloadList) && file_exists($path)) {
             if (!$this->searchHash($path)) {
                 $line = $path . "||" . uniqid();
@@ -58,7 +58,7 @@ class YellowDownload
     public function searchPath($hash)
     {
         $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
-        $downloadList = $extensionDirectory . $this->yellow->system->get("downloadList");
+        $downloadList = './' . $extensionDirectory . $this->yellow->system->get("downloadList");
         if (file_exists($downloadList)) {
             $list = $this->yellow->toolbox->readFile($downloadList);
             $list = str_replace(array("\r\n", "\r", "\n"), "\n", $list);
@@ -78,7 +78,7 @@ class YellowDownload
     public function searchHash($path)
     {
         $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
-        $downloadList = $extensionDirectory . $this->yellow->system->get("downloadList");
+        $downloadList = './' . $extensionDirectory . $this->yellow->system->get("downloadList");
         if (file_exists($downloadList)) {
             $list = $this->yellow->toolbox->readFile($downloadList);
             $list = str_replace(array("\r\n", "\r", "\n"), "\n", $list);
@@ -99,7 +99,7 @@ class YellowDownload
     public function searchDownloadList($hash)
     {
         $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
-        $downloadList = $extensionDirectory . $this->yellow->system->get("downloadList");
+        $downloadList = './' . $extensionDirectory . $this->yellow->system->get("downloadList");
         if (file_exists($downloadList)) {
             $list = $this->yellow->toolbox->readFile($downloadList);
             $list = str_replace(array("\r\n", "\r", "\n"), "\n", $list);
