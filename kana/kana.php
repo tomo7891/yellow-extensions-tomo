@@ -17,7 +17,7 @@ class YellowKana
   public function onParsePageOutput($page, $text)
   {
     $output = null;
-    if ($this->yellow->system->get("kanaConvert") == "on" || $this->yellow->system->get("coreDebugMode") < 1) {
+    if ($this->yellow->system->get("kanaConvert") == "on"  $this->yellow->system->get("coreDebugMode") < 1) {
       $output = mb_convert_kana($text, $this->yellow->system->get("KanaOption"), 'utf-8');
     }
     return $output;
