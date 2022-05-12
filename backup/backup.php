@@ -10,12 +10,12 @@ class YellowBackup
     public function onLoad($yellow)
     {
         $this->yellow = $yellow;
-        $this->yellow->system->setDefault("backupDirectory", "system/backup/");
+        $this->yellow->system->setDefault("backupLocation", "/system/backup/");
         $this->yellow->system->setDefault("backupLimit", "5");
     }
 
     // Handle page meta data
-    public function onParseMeta($page)
+    public function onParseMetaData($page)
     {
         if ($page->get("layout") == "backup") $page->visible = false;
     }
@@ -28,16 +28,16 @@ class YellowBackup
             $output .= "<style>#backupform label {cursor:pointer;}.directory {margin-top:1rem;font-weight:bold;}.subdirectory{display:inline-block;padding-right:1rem;}.submit{margin-top:1rem;}.submit input{margin-right:1rem;}</style>";
         }
         if ($name == "backuplist") {
-            $files = $this->yellow->toolbox->getDirectoryEntries("./" . $this->yellow->system->get("backupDirectory"), "/.*.zip/", true, false, false);
+            $files = $this->yellow->toolbox->getDirectoryEntries("." . $this->yellow->system->get("backupLocation"), "/.*.zip/", true, false, false);
             if (count($files) > 0) {
                 $output .= "<ul>";
                 foreach ($files as $file) {
-                    $hash = $this->yellow->extension->get("download")->searchHash("./" . $this->yellow->system->get("backupDirectory") . $file);
+                    $hash = $this->yellow->extension->get("download")->searchHash("." . $this->yellow->system->get("backupLocation") . $file);
                     if ($hash) {
-                        $url = $page->getLocation(true) . "download:" . $hash . "/";
+                        $url = $page->getLocation(true) . "download" . $this->yellow->toolbox->getLocationArgumentsSeparator() . $hash . "/";
                         $title = basename($file);
                         $output .= "<li>";
-                        $output .= '<a href="' . $url . '">' . $title . ' (' . nicesize(filesize("./" . $this->yellow->system->get("backupDirectory") . $file)) . ')</a>';
+                        $output .= '<a href="' . $url . '">' . $title . ' (' . nicesize(filesize("." . $this->yellow->system->get("backupLocation") . $file)) . ')</a>';
                         $output .= "</li>";
                     }
                 }
@@ -54,28 +54,23 @@ class YellowBackup
         if ($name == "backup" && $page->getRequest("download")) {
             if ($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
                 $file_name = $page->getRequest("download") . '.zip';
-                $file_path = "./" . $this->yellow->system->get("backupDirectory") . $file_name;
+                $file_path = "." . $this->yellow->system->get("backupLocation") . $file_name;
                 $this->yellow->extension->get("download")->download($page, 'application/zip');
             } else {
                 $this->yellow->page->error(404);
             }
         } elseif ($name == "backup" && !$page->getRequest("download")) {
             if ($this->yellow->user->isExisting($this->yellow->user->getUserHtml("email"))) {
-                $request = $this->yellow->toolbox->getServer("REQUEST_URI");
-                $request = str_replace($this->yellow->page->getLocation(true), "", $request);
+                $request = $this->yellow->toolbox->getLocationArguments();
                 if ($request) {
                     $request = explode("/", trim($request, "/"));
                     $content = $media = $system = array();
-                    $backupDirectory = "./" . $this->yellow->system->get("backupDirectory");
-                    $backupDirectory = $backupDirectory . date("Y-m-d-h-i-s");
-                    $backupFile = $backupDirectory . '.zip';
+                    $backupLocation = "." . $this->yellow->system->get("backupLocation");
+                    $backupLocation = $backupLocation . date("Y-m-d-h-i-s");
+                    $backupFile = $backupLocation . '.zip';
                     $k = $v = null;
                     foreach ($request as $key => $value) {
-                        if (strpos($value, "=")) {
-                            list($k, $v) = explode("=", $value);
-                        } elseif (strpos($value, ":")) {
-                            list($k, $v) = explode(":", $value);
-                        }
+                        list($k, $v) = explode($this->yellow->toolbox->getLocationArgumentsSeparator(), $value);
                         $k = str_replace("_", "/", $k);
                         if (substru($k, 0, 7) == "content") {
                             $content[] = "./" . $k;
@@ -92,22 +87,22 @@ class YellowBackup
                         if (count($array) > 0) {
                             foreach ($array as $a) {
                                 if ($a == "./" . $folder) {
-                                    $this->copyProcessor($page, $a, $backupDirectory);
+                                    $this->copyProcessor($page, $a, $backupLocation);
                                     break;
                                 } else {
-                                    $this->copyProcessor($page, $a, $backupDirectory);
+                                    $this->copyProcessor($page, $a, $backupLocation);
                                     continue;
                                 }
                             }
                         }
                     }
-                    $this->zip($backupDirectory, $backupFile);
-                    $this->yellow->toolbox->deleteDirectory($backupDirectory);
+                    $this->zip($backupLocation, $backupFile);
+                    $this->yellow->toolbox->deleteDirectory($backupLocation);
                     $this->yellow->extension->get("download")->addDownloadList($backupFile);
                     header('Location:' . $this->yellow->page->getLocation(true));
                     exit;
                 }
-                $backupZipDirectory = "./" . $this->yellow->system->get("backupDirectory");
+                $backupZipDirectory = "." . $this->yellow->system->get("backupLocation");
                 $zips = $this->yellow->toolbox->getDirectoryEntries($backupZipDirectory, "/.*/", true, false, false);
                 if ($this->yellow->system->get("backupLimit") != 0 && count($zips) > $this->yellow->system->get("backupLimit")) {
                     $files = $this->yellow->toolbox->getDirectoryEntries($backupZipDirectory, "/.*/", true, false, false);
@@ -124,12 +119,12 @@ class YellowBackup
     }
 
 
-    public function copyProcessor($page, $path, $backupDirectory)
+    public function copyProcessor($page, $path, $backupLocation)
     {
         $files = $this->yellow->toolbox->getDirectoryEntriesRecursive("./" . $path, "/.*/", false, false);
         foreach ($files as $file) {
-            if (!strpos($file, $this->yellow->system->get("backupDirectory"))) {
-                $this->yellow->toolbox->copyFile($file, $backupDirectory  . "/" . ltrim($file, './'), true);
+            if (!strpos($file, $this->yellow->system->get("backupLocation"))) {
+                $this->yellow->toolbox->copyFile($file, $backupLocation  . "/" . ltrim($file, './'), true);
             }
         }
     }
