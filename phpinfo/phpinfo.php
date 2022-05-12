@@ -2,7 +2,7 @@
 
 class YellowPhpinfo
 {
-    const VERSION = "0.8.19";
+    const VERSION = "0.8.20";
     public $yellow;         // access to API
 
     // Handle initialisation
@@ -12,7 +12,7 @@ class YellowPhpinfo
     }
 
     // Handle page meta data
-    public function onParseMeta($page)
+    public function onParseMetaData($page)
     {
         if ($page->get("layout") == "phpinfo") $page->visible = false;
     }
