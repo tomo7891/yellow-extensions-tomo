@@ -3,13 +3,14 @@
 
 class YellowLogger
 {
-    const VERSION = "0.8.19";
+    const VERSION = "0.8.20";
     public $yellow;         // access to API
 
     // Handle initialization
     public function onLoad($yellow)
     {
         $this->yellow = $yellow;
+        $this->yellow->system->setDefault("loggerLocation", "/system/extensions/");
         $this->yellow->system->setDefault("loggerErrorFile", "yellow-error.log");
         $this->yellow->system->setDefault("loggerAccessFile", "yellow-access.log");
         $this->yellow->system->setDefault("loggerRedirectsFile", "yellow-redirects.ini");
@@ -17,9 +18,9 @@ class YellowLogger
 
     public function onParsePageOutput($page, $text)
     {
-        $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
+        $loggerLocation = "." . $this->yellow->system->get("loggerLocation");
         //Access Logger
-        if (file_exists($extensionDirectory . $this->yellow->system->get("loggerAccessFile"))) {
+        if (file_exists($loggerLocation . $this->yellow->system->get("loggerAccessFile"))) {
             $h = $l = $u = $t = $r = $s = $b = $ref = $ua = null;
             $h = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "-";
             $l = "-";
@@ -33,29 +34,35 @@ class YellowLogger
             $ref = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "-";
             $ua = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "-";
             $line = "{$h} {$l} {$u} [{$t}] \"{$m} {$uri} {$prot}\" {$s} {$b} \"{$ref}\" \"{$ua}\"";
-            $this->yellow->toolbox->appendFile($extensionDirectory . $this->yellow->system->get("loggerAccessFile"), $line . "\n");
+            $this->yellow->toolbox->appendFile($loggerLocation . $this->yellow->system->get("loggerAccessFile"), $line . "\n");
         }
         //404 Logger
-        if (file_exists($extensionDirectory . $this->yellow->system->get("loggerErrorFile"))) {
+        if (file_exists($loggerLocation . $this->yellow->system->get("loggerErrorFile"))) {
             if ($page->getStatusCode() == '404') {
-                $list = $this->yellow->toolbox->readFile($extensionDirectory . $this->yellow->system->get("loggerErrorFile"));
+                $list = $this->yellow->toolbox->readFile($loggerLocation . $this->yellow->system->get("loggerErrorFile"));
                 $list = str_replace(array("\r\n", "\r", "\n"), "\n", $list);
                 $list = explode("\n", $list);
                 $line = $page->getLocation();
                 if (!in_array($line, $list)) {
-                    $this->yellow->toolbox->appendFile($extensionDirectory . $this->yellow->system->get("loggerErrorFile"), $line . "\n");
+                    $this->yellow->toolbox->appendFile($loggerLocation . $this->yellow->system->get("loggerErrorFile"), $line . "\n");
                 }
             }
         }
-        //301Redirects    
-        if (file_exists($extensionDirectory . $this->yellow->system->get("loggerRedirectsFile"))) {
-            $list = $this->yellow->toolbox->readFile($extensionDirectory . $this->yellow->system->get("loggerRedirectsFile"));
+    }
+
+    // Handle page layout
+    public function onParsePageLayout($page, $name)
+    {
+        $loggerLocation = $this->yellow->system->get("loggerLocation");
+        if (file_exists($loggerLocation . $this->yellow->system->get("loggerRedirectsFile"))) {
+            $list = $this->yellow->toolbox->readFile($loggerLocation . $this->yellow->system->get("loggerRedirectsFile"));
             $list = str_replace(array("\r\n", "\r", "\n"), "\n", $list);
             $list = explode("\n", $list);
             foreach ($list as $l) {
                 if (strpos($l, '||')) {
                     $r = explode("||", trim($l));
                     if ($page->getLocation() == trim($r[0])) {
+                        $page->error(301, "redirecting....");
                         $url = $this->getAbsoluteUrl() . '/' . ltrim(trim($r[1]), '/');
                         $url = $this->yellow->lookup->normaliseUrl("", "", "", $url);
                         header("Location: " . $url, true, 301);
@@ -70,10 +77,10 @@ class YellowLogger
     public function onCommand($command, $text)
     {
         $statusCode = 0;
-        $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
-        $accessLog = $extensionDirectory . $this->yellow->system->get("loggerAccessFile");
-        $errorLog = $extensionDirectory . $this->yellow->system->get("loggerErrorFile");
-        $redirects = $extensionDirectory . $this->yellow->system->get("loggerRedirectsFile");
+        $loggerLocation = $this->yellow->system->get("loggerLocation");
+        $accessLog = $loggerLocation . $this->yellow->system->get("loggerAccessFile");
+        $errorLog = $loggerLocation . $this->yellow->system->get("loggerErrorFile");
+        $redirects = $loggerLocation . $this->yellow->system->get("loggerRedirectsFile");
         list($action, $target) = $this->yellow->toolbox->getTextArguments($text);
         if ($command == "logger") {
             if ($action == "clean" || $action == "-c") {
