@@ -9,37 +9,17 @@
     .mb {
         margin-bottom: 20px;
     }
-    #close {
-        background:none;border:none;cursor: pointer;
-    }
-    #close span {
-        display:inline-block;vertical-align: middle;
-    }
-    #close svg {
-        height:1rem;width:1rem;vertical-align: middle;
-    }
 </style>
 <div class="tc mt">
-    <button type="button" id="close">
-        <span>Close</span> 
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-    </button>
+    <input type="button" value="Close" onclick="winClose();">
 </div>
 <?php echo phpinfo() ?>
 <div class="tc mb">
-    <button type="button" id="close">
-        <span>Close</span> 
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-    </button>
+    <input type="button" value="Close" onclick="winClose();">
 </div>
 <script>
-    let closebutton = document.getElementById('close');
-    closebutton.addEventListener('click', () => {
-        close();
-    });
+    function winClose(){
+      open(location, '_self').close();
+    }
     </script>
 <?php endif ?>
