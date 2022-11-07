@@ -3,7 +3,7 @@
 
 class YellowSurl
 {
-    const VERSION = "0.8.20";
+    const VERSION = "0.8.21";
     public $yellow;         // access to API
 
     // Handle initialization
@@ -51,12 +51,8 @@ class YellowSurl
 
     public function getAbsoluteUrl()
     {
-        if ($this->yellow->system->get("coreStaticUrl") == "auto") {
-            $protocol = ($_SERVER["HTTPS"]) ? "https" : "http";
-            $output = $protocol . '://' . $_SERVER['HTTP_HOST'];
-        } else {
-            $output = $this->yellow->system->get("coreStaticUrl");
-        }
+		$protocol = ($_SERVER["HTTPS"]) ? "https" : "http";
+		$output = $protocol . '://' . $_SERVER['SERVER_NAME'];
         return $output;
     }
 }
