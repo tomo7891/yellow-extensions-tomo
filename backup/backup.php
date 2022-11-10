@@ -3,7 +3,7 @@
 
 class YellowBackup
 {
-    const VERSION = "0.8.20";
+    const VERSION = "0.8.21";
     public $yellow;            //access to API
 
     // Handle initialisation
@@ -31,7 +31,7 @@ class YellowBackup
             $coreSystemDirectory = $this->yellow->system->get("coreSystemDirectory");
             $backupDirectory = "./" . $coreSystemDirectory . $this->yellow->system->get("backupDirectory");
             $files = $this->yellow->toolbox->getDirectoryEntries($backupDirectory, "/.*.zip/", true, false, false);
-            if (count($files) > 0) {
+            if (!is_array_empty($files)) {
                 $output .= "<ul>";
                 foreach ($files as $file) {
                     $hash = $this->yellow->extension->get("download")->searchHash($backupDirectory . $file);
@@ -87,7 +87,7 @@ class YellowBackup
                     }
                     $backupFolders = ['content' => $content, 'media' => $media, 'system' => $system];
                     foreach ($backupFolders as $folder => $array) {
-                        if (count($array) > 0) {
+                        if (!is_array_empty($array)) {
                             foreach ($array as $a) {
                                 if ($a == "./" . $folder) {
                                     $this->copyProcessor($page, $a, $backupDirectory);
