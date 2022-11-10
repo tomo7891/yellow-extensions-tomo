@@ -4,7 +4,7 @@
 
 class YellowWebp
 {
-    const VERSION = "0.8.19";
+    const VERSION = "0.8.20";
     public $yellow;         // access to API
 
     // Handle initialisation
@@ -20,7 +20,7 @@ class YellowWebp
     {
         $output = null;
         $content = $text;
-        if (empty($content)) return;
+        if (is_string_empty($content)) return;
         if ((isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false) and $this->basic_checks()) {
             //fix for xml
             if (preg_match("/{$this->yellow->system->getHtml("webpExcludeContentType")}/i", $page->getRequest("page"))) {
@@ -61,13 +61,14 @@ class YellowWebp
     {
         $statusCode = 0;
         list($action) = $this->yellow->toolbox->getTextArguments($text);
-        $coreMediaDirectory = $this->yellow->system->get("CoreMediaDirectory");
-        $imageDir = explode("/", $this->yellow->system->get("CoreImageDirectory"));
-        $thumbDir = explode("/", $this->yellow->system->get("ImageThumbnailDirectory"));
+        $CoreMediaLocation = $this->yellow->system->get("CoreMediaLocation");
+        $CoreMediaLocation = ltrim('/', $CoreMediaLocation);
+        $imageDir = explode("/", $this->yellow->system->get("CoreMediaLocation"));
+        $thumbDir = explode("/", $this->yellow->system->get("CoreThumbnailLocation"));
         if ($command == "webp") {
             if ($action == "convert" || $action == "-c") {
                 $pattern = "(" . $imageDir[1] . "|" . $thumbDir[1] . ")/.*?.(jpe?g|png)";
-                $files = $this->yellow->media->index(true, true)->match("#$coreMediaDirectory$pattern#");
+                $files = $this->yellow->media->index(true, true)->match("#$CoreMediaLocation$pattern#");
                 $i = 0;
                 $filesEstimated = count($files);
                 foreach ($files as $file) {
@@ -76,7 +77,7 @@ class YellowWebp
                         echo "\rConverting to Webp " . $this->getProgressPercent($i, $filesEstimated, 5, 95) . "%... ";
                         $this->convert($file->fileName);
                         if ($this->yellow->system->get("coreDebugMode") >= 1) {
-                            echo "Convert: /$file->fileName => $webp\n";
+                            echo "Convert: $file->fileName => $webp\n";
                         }
                         $i++;
                     }
@@ -84,7 +85,7 @@ class YellowWebp
                 echo "\rConverting to Webp 100%... done";
                 $statusCode = 200;
             } elseif ($action == "delete" || $action == "-d") {
-                $path = "./" . $this->yellow->system->get("CoreMediaDirectory") . $this->yellow->system->get("webpDirectory");
+                $path = "." . $this->yellow->system->get("CoreMediaLocation") . $this->yellow->system->get("webpDirectory");
                 if (file_exists($path)) {
                     $this->yellow->toolbox->deleteDirectory($path);
                     echo "Success: delete webp Directory";
@@ -121,7 +122,7 @@ class YellowWebp
 
     public function check_cache_folder()
     {
-        $path = "./" . $this->yellow->system->get("CoreMediaDirectory") . $this->yellow->system->get("webpDirectory");
+        $path = "." . $this->yellow->system->get("CoreMediaLocation") . $this->yellow->system->get("webpDirectory");
         if (!file_exists($path)) {
             // folder does not exist
             mkdir($path, 0777, true);
@@ -176,19 +177,17 @@ class YellowWebp
         $pathArray = explode('/', $path);
 
         // we start from $cahcePath
-        $finalPath = $this->yellow->system->get("CoreMediaDirectory") . $this->yellow->system->get("webpDirectory");
+        $finalPath = $this->yellow->system->get("CoreMediaLocation") . $this->yellow->system->get("webpDirectory");
 
         // add folder structure to $cachePath
         foreach ($pathArray as $folder) {
-            if (!empty($folder)) {
+            if (!is_string_empty($folder)) {
                 $finalPath .= '/' . $folder;
             }
         }
         // return final path, starting with /
-        return '/' . $finalPath;
+        return $finalPath;
     }
-
-
 
     public function convert($srcIn)
     {
