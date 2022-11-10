@@ -1,27 +1,12 @@
 <?php
 // Functions extension
 
-// Return meta data from page blog
-function getMeta($pages, $key)
-{
-    $data = array();
-    foreach ($pages as $page) {
-        if ($page->isExisting($key)) {
-            foreach (preg_split("/\s*,\s*/", $page->get($key)) as $entry) {
-                if (!isset($data[$entry])) $data[$entry] = 0;
-                ++$data[$entry];
-            }
-        }
-    }
-    return $data;
-}
-
 //Number Format
 //https://www.php.net/manual/ja/function.number-format.php
 function number($v, $o = '')
 {
-    if (empty($v)) return;
-    if (empty($o)) {
+    if (is_string_empty($v)) return;
+    if (is_string_empty($o)) {
         $o = 0;
     }
     return number_format($v, $o);
@@ -55,19 +40,20 @@ function summary($text, $offset, $size, $encoding)
     return $return_text;
 }
 
-//現在のコンテンツ場所
+//現在のコンテンツ位置
 function isContent($topLocation, $location)
 {
     if (!$topLocation || !$location) return;
-    if ($topLocation == $location) return true;
+    if (preg_match("#{$location}#", $topLocation)) return true;
     else return false;
 }
 
 //csv to html
-function csv2html($fileData, $activeHeader)
+function csv2table($fileData, $activeHeader)
 {
     $output = null;
     $list = explode("\n", trim($fileData));
+    $output .= "<table>";
     if ($activeHeader == '1') {
         $header = explode("|", $list[0]);
         $list = array_slice($list, 1);
@@ -87,6 +73,24 @@ function csv2html($fileData, $activeHeader)
         $output .= "</tr>";
     }
     $output .= "</tbody>";
+    $output .= "</table>";
+    return $output;
+}
+
+//csv to Link list
+function csv2list($fileData)
+{
+    $output = null;
+    $list = explode("\n", trim($fileData));
+    $list = array_slice($list, 1);
+    $output .= "<ul>";
+    foreach ($list as $l) {
+        $l = explode("|", $l);
+        $title = $l[0];
+        $url = $l[1];
+        $output .= '<li><a href="' . $url . '">' . $title . '</a></li>';
+    }
+    $output .= "</ul>";
     return $output;
 }
 
@@ -105,8 +109,8 @@ function nicesize($size)
 //リサイズ計算
 function resizeImage($src, $size)
 {
-    if (!empty($src)) {
-        if (empty($size)) {
+    if (!is_string_empty($src)) {
+        if (is_string_empty($size)) {
             $size = 'original';
         }
         switch ($size) {
@@ -241,7 +245,7 @@ class DatetimeUtility
                 }
             }
             // 元号が取得できない場合はException
-            if (empty($gengo)) {
+            if (is_string_empty($gengo)) {
                 throw new Exception('Can not be converted to a timestamp : ' . $timestamp);
             }
         }
