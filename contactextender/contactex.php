@@ -1,5 +1,5 @@
 <?php
-// Contact extension, https://github.com/datenstrom/yellow-extensions/tree/master/source/contact
+// Contact extender extension, https://github.com/datenstrom/yellow-extensions/tree/master/source/contact
 
 include_once("contact.php");
 class YellowContactex extends YellowContact
