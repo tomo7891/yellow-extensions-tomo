@@ -3,7 +3,7 @@
 
 class YellowLogger
 {
-    const VERSION = "0.8.21";
+    const VERSION = "0.8.22";
     public $yellow;         // access to API
 
     // Handle initialization
@@ -21,17 +21,17 @@ class YellowLogger
         //Access Logger
         if (file_exists($coreExtensionDirectory . $this->yellow->system->get("loggerAccessFile"))) {
             $h = $l = $u = $t = $r = $s = $b = $ref = $ua = null;
-            $h = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "-";
+            $h = !is_string_empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "-";
             $l = "-";
             $u = "-";
             $t = date("Y/m/d H:i:s");
-            $m = !empty($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : "-";
-            $uri = !empty($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : "-";
-            $prot = !empty($_SERVER["SERVER_PROTOCOL"]) ? $_SERVER["SERVER_PROTOCOL"] : "-";
+            $m = !is_string_empty($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : "-";
+            $uri = !is_string_empty($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : "-";
+            $prot = !is_string_empty($_SERVER["SERVER_PROTOCOL"]) ? $_SERVER["SERVER_PROTOCOL"] : "-";
             $s = $page->getStatusCode();
             $b = strlen($text);
-            $ref = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "-";
-            $ua = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "-";
+            $ref = !is_string_empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "-";
+            $ua = !is_string_empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "-";
             $line = "{$h} {$l} {$u} [{$t}] \"{$m} {$uri} {$prot}\" {$s} {$b} \"{$ref}\" \"{$ua}\"";
             $this->yellow->toolbox->appendFile($coreExtensionDirectory . $this->yellow->system->get("loggerAccessFile"), $line . "\n");
         }
