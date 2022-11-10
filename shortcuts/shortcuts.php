@@ -2,7 +2,7 @@
 // Short Cuts extension
 
 class YellowShortcuts {
-  const VERSION = "0.8.19";
+  const VERSION = "0.8.20";
   public $yellow;         // access to API
 
   // Handle initialization
@@ -43,12 +43,12 @@ class YellowShortcuts {
   //[$name $key $encode]
   public function getSystemValue($page, $name, $text) {
         $output = null;
-        if (empty($text)) {
+        if (is_string_empty($text)) {
             return $output;
         }
         list($key, $encode) = $this->yellow->toolbox->getTextArguments($text);
         if($name == 'user') {
-            if (empty($encode)) {
+            if (is_string_empty($encode)) {
                 $encode = 'false';
             }
             if ($encode != 'true') {
@@ -58,7 +58,7 @@ class YellowShortcuts {
             }
             return $output;
         } elseif($name == 'language') {
-            if (empty($encode)) {
+            if (is_string_empty($encode)) {
                 $encode = 'false';
             }
             if ($encode != 'true') {
@@ -68,7 +68,7 @@ class YellowShortcuts {
             }
             return $output;
         } elseif($name == 'system') {
-            if (empty($encode)) {
+            if (is_string_empty($encode)) {
                 $encode = 'false';
             }
             if ($encode != 'true') {
@@ -83,16 +83,16 @@ class YellowShortcuts {
     //[page path key encode]
     public function getPageValue($page, $name, $text) {
         $output = null;
-        if (empty($text)) {
+        if (is_string_empty($text)) {
             return $output;
         }
         list($path, $key, $encode) = $this->yellow->toolbox->getTextArguments($text);
-        if(empty($path)){
+        if(is_string_empty($path)){
             $page = $page;
         }else{
             $page = $this->yellow->content->find($path);
         }
-        if (empty($encode) || $encode = 'false') {
+        if (is_string_empty($encode) || $encode = 'false') {
             return $page->get($key);
         }
         if ($encode == 'true') {
@@ -104,10 +104,10 @@ class YellowShortcuts {
     public function getPageDate($page, $name, $text) {
         $output = null;
         list($key, $format, $encode) = $this->yellow->toolbox->getTextArguments($text);
-        if (empty($encode)) {
+        if (is_string_empty($encode)) {
             $encode = 'false';
         }
-        if (empty($format)) {
+        if (is_string_empty($format)) {
             $format = "CoreDateFormatMedium";
         }
         if ($encode != 'true') {
@@ -125,9 +125,9 @@ class YellowShortcuts {
         list($path, $title) = $this->yellow->toolbox->getTextArguments($text);
         if (strpos($path, '#')) list($path, $hash) = explode('#', $path);
         $page = $this->yellow->content->find($path);
-        if (empty($title) && $hash) {
+        if (is_string_empty($title) && $hash) {
             $title = $hash;
-        } elseif (empty($title)) {
+        } elseif (is_string_empty($title)) {
             $title = $page->getHtml("title");
         }
         if($hash) $hash = "#".$hash;
@@ -140,18 +140,18 @@ class YellowShortcuts {
     public function getPages($page, $name, $text) {
         $output = null;
         list($path, $sort, $dir, $limit) = $this->yellow->toolbox->getTextArguments($text);
-        if (empty($path) || $path == "-") {
+        if (is_string_empty($path) || $path == "-") {
             $path = $page->getLocation();
         }
-        if (empty($sort) || $sort == "-") {
+        if (is_string_empty($sort) || $sort == "-") {
             $sort = "title";
         }
-        if (empty($dir) || $dir == "-" || $dir == "1" || $dir == "asc") {
+        if (is_string_empty($dir) || $dir == "-" || $dir == "1" || $dir == "asc") {
             $dir = true;
         }elseif($dir == "0" || $dir == "desc"){
             $dir = false;
         }
-        if (empty($limit) || $limit == "-") {
+        if (is_string_empty($limit) || $limit == "-") {
             $limit = 0;
         }
         $pages = $this->yellow->content->find($path)->getChildren()->sort($sort, $dir);
