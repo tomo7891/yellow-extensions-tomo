@@ -1,5 +1,5 @@
 <?php
-// Blog Type Extender extension
+// Blog Type extension
 
 class YellowBlogtype
 {
