@@ -4,7 +4,7 @@
 include_once("blog.php");
 class YellowBlogex extends YellowBlog
 {
-    const VERSION = "0.8.21";
+    const VERSION = "0.8.22";
     public $yellow;         // access to API
 
     // Handle initialization
@@ -86,7 +86,7 @@ class YellowBlogex extends YellowBlog
         $page->setLastModified($pages->getModified());
         $categories = $this->getMeta($pages, "category");
         if (!is_array_empty($categories)) {
-            $categories = $this->yellow->lookup->normaliseUpperLower($categories);
+            $categories = $this->yellow->lookup->normaliseArray($categories);
             if ($entriesMax != 0 && count($categories) > $entriesMax) {
                 uasort($categories, "strnatcasecmp");
                 $categories = array_slice($categories, -$entriesMax, $entriesMax, true);
@@ -95,7 +95,7 @@ class YellowBlogex extends YellowBlog
             $output = "<div class=\"" . htmlspecialchars($name) . "\">\n";
             $output .= "<ul>\n";
             foreach ($categories as $key => $value) {
-                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->toolbox->normaliseArguments("category:$key") . "\">";
+                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->lookup->normaliseArguments("category:$key") . "\">";
                 $output .= htmlspecialchars($key) . "</a></li>\n";
             }
             $output .= "</ul>\n";
@@ -106,7 +106,7 @@ class YellowBlogex extends YellowBlog
         return $output;
     }
 
-    // Return blogcontributors shortcut
+    // Return blogcontributors shortcuts
     public function getShortcutBlogcontributors($page, $name, $text)
     {
         $output = null;
@@ -118,7 +118,7 @@ class YellowBlogex extends YellowBlog
         $page->setLastModified($pages->getModified());
         $contributors = $this->getMeta($pages, "contributor");
         if (!is_array_empty($contributors)) {
-            $contributors = $this->yellow->lookup->normaliseUpperLower($contributors);
+            $contributors = $this->yellow->lookup->normaliseArray($contributors);
             if ($entriesMax != 0 && count($contributors) > $entriesMax) {
                 uasort($contributors, "strnatcasecmp");
                 $contributors = array_slice($contributors, -$entriesMax, $entriesMax, true);
@@ -127,7 +127,7 @@ class YellowBlogex extends YellowBlog
             $output = "<div class=\"" . htmlspecialchars($name) . "\">\n";
             $output .= "<ul>\n";
             foreach ($contributors as $key => $value) {
-                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->toolbox->normaliseArguments("contributor:$key") . "\">";
+                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->lookup->normaliseArguments("contributor:$key") . "\">";
                 $output .= htmlspecialchars($key) . "</a></li>\n";
             }
             $output .= "</ul>\n";
@@ -150,7 +150,7 @@ class YellowBlogex extends YellowBlog
         $page->setLastModified($pages->getModified());
         $by = $this->getMeta($pages, "by");
         if (!is_array_empty($by)) {
-            $by = $this->yellow->lookup->normaliseUpperLower($by);
+            $by = $this->yellow->lookup->normaliseArray($by);
             if ($entriesMax != 0 && count($by) > $entriesMax) {
                 uasort($by, "strnatcasecmp");
                 $by = array_slice($by, -$entriesMax, $entriesMax, true);
@@ -159,7 +159,7 @@ class YellowBlogex extends YellowBlog
             $output = "<div class=\"" . htmlspecialchars($name) . "\">\n";
             $output .= "<ul>\n";
             foreach ($by as $key => $value) {
-                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->toolbox->normaliseArguments("by:$key") . "\">";
+                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->lookup->normaliseArguments("by:$key") . "\">";
                 $output .= htmlspecialchars($key) . "</a></li>\n";
             }
             $output .= "</ul>\n";
@@ -182,7 +182,7 @@ class YellowBlogex extends YellowBlog
         $page->setLastModified($pages->getModified());
         $from = $this->getMeta($pages, "from");
         if (!is_array_empty($from)) {
-            $from = $this->yellow->lookup->normaliseUpperLower($from);
+            $from = $this->yellow->lookup->normaliseArray($from);
             if ($entriesMax != 0 && count($from) > $entriesMax) {
                 uasort($from, "strnatcasecmp");
                 $from = array_slice($from, -$entriesMax, $entriesMax, true);
@@ -191,7 +191,7 @@ class YellowBlogex extends YellowBlog
             $output = "<div class=\"" . htmlspecialchars($name) . "\">\n";
             $output .= "<ul>\n";
             foreach ($from as $key => $value) {
-                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->toolbox->normaliseArguments("from:$key") . "\">";
+                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->lookup->normaliseArguments("from:$key") . "\">";
                 $output .= htmlspecialchars($key) . "</a></li>\n";
             }
             $output .= "</ul>\n";
@@ -214,7 +214,7 @@ class YellowBlogex extends YellowBlog
         $page->setLastModified($pages->getModified());
         $publisher = $this->getMeta($pages, "publisher");
         if (!is_array_empty($publisher)) {
-            $publisher = $this->yellow->lookup->normaliseUpperLower($publisher);
+            $publisher = $this->yellow->lookup->normaliseArray($publisher);
             if ($entriesMax != 0 && count($publisher) > $entriesMax) {
                 uasort($publisher, "strnatcasecmp");
                 $publisher = array_slice($publisher, -$entriesMax, $entriesMax, true);
@@ -223,7 +223,7 @@ class YellowBlogex extends YellowBlog
             $output = "<div class=\"" . htmlspecialchars($name) . "\">\n";
             $output .= "<ul>\n";
             foreach ($publisher as $key => $value) {
-                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->toolbox->normaliseArguments("publisher:$key") . "\">";
+                $output .= "<li><a href=\"" . $blogStart->getLocation(true) . $this->yellow->lookup->normaliseArguments("publisher:$key") . "\">";
                 $output .= htmlspecialchars($key) . "</a></li>\n";
             }
             $output .= "</ul>\n";
@@ -349,7 +349,7 @@ class YellowBlogex extends YellowBlog
             if (++$tagCounter > 1) {
                 $output .= ", ";
             }
-            $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->toolbox->normaliseArguments("tag:$tag") . "\">";
+            $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->lookup->normaliseArguments("tag:$tag") . "\">";
             $output .= htmlspecialchars($tag);
             $output .= "</a>";
         }
@@ -361,7 +361,7 @@ class YellowBlogex extends YellowBlog
         $output = null;
         $tagCounter = 0;
         $output .= $this->yellow->language->getTextHtml("category") . " ";
-        $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->toolbox->normaliseArguments("category:" . $page->get("category")) . "\">";
+        $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->lookup->normaliseArguments("category:" . $page->get("category")) . "\">";
         $output .= htmlspecialchars($this->yellow->page->get("category"));
         $output .= "</a>";
         return $output;
@@ -376,7 +376,7 @@ class YellowBlogex extends YellowBlog
             if (++$contributorCounter > 1) {
                 $output .= ", ";
             }
-            $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->toolbox->normaliseArguments("contributor:$contributor") . "\">";
+            $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->lookup->normaliseArguments("contributor:$contributor") . "\">";
             $output .= htmlspecialchars($contributor);
             $output .= "</a>";
         }
@@ -392,7 +392,7 @@ class YellowBlogex extends YellowBlog
             if (++$byCounter > 1) {
                 $output .= ", ";
             }
-            $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->toolbox->normaliseArguments("by:$by") . "\">";
+            $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->lookup->normaliseArguments("by:$by") . "\">";
             $output .= htmlspecialchars($by);
             $output .= "</a>";
         }
@@ -404,7 +404,7 @@ class YellowBlogex extends YellowBlog
         $output = null;
         $tagCounter = 0;
         $output .= $this->yellow->language->getTextHtml("from") . " ";
-        $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->toolbox->normaliseArguments("from:" . $page->get("from")) . "\">";
+        $output .= "<a href=\"" . $page->getPage("blogStart")->getLocation(true) . $this->yellow->lookup->normaliseArguments("from:" . $page->get("from")) . "\">";
         $output .= htmlspecialchars($this->yellow->page->get("from"));
         $output .= "</a>";
         return $output;

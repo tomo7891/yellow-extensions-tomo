@@ -3,7 +3,7 @@
 
 class YellowBlogtype
 {
-    const VERSION = "0.8.20";
+    const VERSION = "0.8.21";
     public $yellow;         // access to API
 
     // Handle initialization
@@ -183,7 +183,7 @@ class YellowBlogtype
         $dir = $this->yellow->system->get("CoreDownloadLocation");
         $dir = $dir . $this->yellow->system->get("linkDirectory");
         $csv = "." . $dir . $page->getHtml("link") . '.csv';
-        $fileName = $this->yellow->toolbox->normalisePath($csv);
+        $fileName = $this->yellow->lookup->normalisePath($csv);
         $fileData = $this->yellow->toolbox->readFile($fileName);
         if (!is_string_empty($fileData)) {
             $output = csv2list($fileData); //functions.php
@@ -232,7 +232,7 @@ class YellowBlogtype
         $csv = $page->getHtml("literature");
         $dir = $this->yellow->system->get("CoreDownloadLocation");
         $dir = '.' . $dir . $this->yellow->system->get("literatureDirectory");
-        $fileName = $this->yellow->toolbox->normalisePath($dir . $csv . '.csv');
+        $fileName = $this->yellow->lookup->normalisePath($dir . $csv . '.csv');
         $fileData = $this->yellow->toolbox->readFile($fileName);
         if (!is_string_empty($fileData)) {
             $output .= csv2table($fileData, $activeHeader);
@@ -379,7 +379,7 @@ class YellowBlogtype
             $csv = $page->getHtml("errata");
             $dir = $this->yellow->system->get("CoreDownloadLocation");
             $dir = '.' . $dir . $this->yellow->system->get("publicationDirectory");
-            $fileName = $this->yellow->toolbox->normalisePath($dir . $csv . '.csv');
+            $fileName = $this->yellow->lookup->normalisePath($dir . $csv . '.csv');
             $fileData = $this->yellow->toolbox->readFile($fileName);
             if (!is_string_empty($fileData)) {
                 $output .= csv2table($fileData, $activeHeader);
