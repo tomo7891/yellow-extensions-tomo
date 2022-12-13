@@ -4,7 +4,7 @@
 
 class YellowWebp
 {
-    const VERSION = "0.8.20";
+    const VERSION = "0.8.21";
     public $yellow;         // access to API
 
     // Handle initialisation
@@ -29,8 +29,10 @@ class YellowWebp
             // webp is supported!
             // and we have all the needed functions
             $dom = new DOMDocument();
-            $internalErrors = libxml_use_internal_errors(true);
-            $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
+            $internalErrors = libxml_use_internal_errors(true);            
+            $content = htmlspecialchars_decode(mb_convert_encoding(htmlentities($content, ENT_COMPAT, 'utf-8', false),'UTF-8'));
+            $dom->loadHTML($content);
+            
             // standard image
             foreach ($dom->getElementsByTagName('img') as $node) {
                 $this->serve_node($node, 'src');
