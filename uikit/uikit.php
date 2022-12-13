@@ -3,13 +3,14 @@
 
 class YellowUikit
 {
-    const VERSION = "0.8.19";
+    const VERSION = "0.8.21";
     public $yellow;         // access to API
 
     // Handle initialisation
     public function onLoad($yellow)
     {
         $this->yellow = $yellow;
+        $this->yellow->system->setDefault('uikitVer', '3.15.18');
     }
 
     // Handle page content of shortcut
@@ -104,10 +105,11 @@ class YellowUikit
         if ($name == "header") {
             $extensionLocation = $this->yellow->system->get("coreServerBase").$this->yellow->system->get("coreExtensionLocation");
             //$output .= "<script type=\"text/javascript\" src=\"{$extensionLocation}uikit.js\"></script>\n";
-            $output .= "<script src=\"https://cdn.jsdelivr.net/npm/uikit@3.15.12/dist/js/uikit-core.min.js\"></script>\n";
-            $output .= "<script src=\"https://cdn.jsdelivr.net/npm/uikit@3.15.12/dist/js/components/lightbox-panel.min.js\"></script>\n";
-            $output .= "<script src=\"https://cdn.jsdelivr.net/npm/uikit@3.15.12/dist/js/components/lightbox.min.js\"></script>\n";
-            $output .= "<script src=\"https://cdn.jsdelivr.net/npm/uikit@3.15.12/dist/js/uikit-icons.min.js\" defer></script>\n";            
+            $version = $this->yellow->system->get("uikitVer");
+            $output .= "<script src=\"https://cdn.jsdelivr.net/npm/uikit@$version/dist/js/uikit-core.min.js\"></script>\n";
+            $output .= "<script src=\"https://cdn.jsdelivr.net/npm/uikit@$version/dist/js/components/lightbox-panel.min.js\"></script>\n";
+            $output .= "<script src=\"https://cdn.jsdelivr.net/npm/uikit@$version/dist/js/components/lightbox.min.js\"></script>\n";
+            $output .= "<script src=\"https://cdn.jsdelivr.net/npm/uikit@$version/dist/js/uikit-icons.min.js\"></script>\n";            
         }
         if($name == "footer") {
             $output .= "<script>\n";
