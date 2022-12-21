@@ -4,7 +4,7 @@
 
 class YellowWebp
 {
-    const VERSION = "0.8.21";
+    const VERSION = "0.8.22";
     public $yellow;         // access to API
 
     // Handle initialisation
@@ -30,7 +30,7 @@ class YellowWebp
             // and we have all the needed functions
             $dom = new DOMDocument();
             $internalErrors = libxml_use_internal_errors(true);            
-            $content = htmlspecialchars_decode(mb_convert_encoding(htmlentities($content, ENT_COMPAT, 'utf-8', false),'UTF-8'));
+            $content = mb_encode_numericentity($content, [0x80, 0x10ffff, 0, 0x1fffff]);
             $dom->loadHTML($content);
             
             // standard image
