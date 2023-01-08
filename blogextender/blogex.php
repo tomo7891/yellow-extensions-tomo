@@ -4,7 +4,7 @@
 include_once("blog.php");
 class YellowBlogex extends YellowBlog
 {
-    const VERSION = "0.8.22";
+    const VERSION = "0.8.23";
     public $yellow;         // access to API
 
     // Handle initialization
@@ -287,7 +287,7 @@ class YellowBlogex extends YellowBlog
             $pages->sort($sort, $asc);
             if (!is_string_empty($pagesFilter)) {
                 $text = implode(" ", $pagesFilter);
-                $page->set("titleHeader", $text . " - " . $page->get("sitename"));
+                $page->set("titleHeader", $page->get("title") . " - " . $page->get("sitename"));
                 if (!$page->isRequest("tag") && !$page->isRequest("author") && !$page->isRequest("published")) {
                     if($text){
                         $page->set("titleContent", $page->get("title") . ": " . $text);
