@@ -1,36 +1,29 @@
 <?php
 // Minify HTML extension
 
-class YellowMinify
-{
-  const VERSION = "0.8.19";
-  public $yellow;         // access to API
+class YellowMinify {
+    const VERSION = "0.8.22";
+    public $yellow;
 
-  // Handle initialization
-  public function onLoad($yellow)
-  {
-    $this->yellow = $yellow;
-    $this->yellow->system->setDefault("minify", "on");
-    $this->yellow->system->setDefault("minifyExcludeContentType", "xml");
-  }
-
-  public function onParsePageOutput($page, $text)
-  {
-    if (preg_match("/{$this->yellow->system->get("minifyExcludeContentType")}/i", $page->getRequest("page"))) {
-      return $text;
-    }
-    if ($this->yellow->system->get("minify") != "on" || $this->yellow->system->get("coreDebugMode") >= 1) {
-      return $text;
+    public function onLoad($yellow) {
+        $this->yellow = $yellow;
+        $this->yellow->system->setDefault("minifyHtml", "1");
     }
 
-    //html
-    $search = array(
-      '/^\\s+|\\s+$/m'
-    );
-    $replace = array(
-      ''
-    );
-    $text = preg_replace($search, $replace, $text);
-    return $text;
-  }
+    public function onParsePageOutput($page, $output) {
+        $isMinify = $this->yellow->system->get("minifyHtml") == "1";
+        $isDebug = $this->yellow->system->get("coreDebugMode") >= 1;
+
+        if ($isMinify && !$isDebug && !is_null($output)) {
+            // 1. 各行の行頭・行末の空白を削除 [cite: 607, 633]
+            $output = preg_replace('/^\s+|\s+$/m', '', $output);
+            
+            // 2. タグ間の空白を削除 (インライン要素の隙間が詰まるので注意) 
+            $output = preg_replace('/>\s+</s', '><', $output);
+            
+            // 3. 連続する改行を1つの改行に集約 (完全に消さないことでJSの1行コメントを保護)
+            $output = preg_replace('/\n+/s', "\n", $output);
+        }
+        return $output;
+    }
 }
