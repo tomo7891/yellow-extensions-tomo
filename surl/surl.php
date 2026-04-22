@@ -1,58 +1,65 @@
 <?php
 // Short URL extension
 
-class YellowSurl
-{
+class YellowSurl {
     const VERSION = "0.8.21";
-    public $yellow;         // access to API
+    public $yellow;
 
-    // Handle initialization
-    public function onLoad($yellow)
-    {
+    public function onLoad($yellow) {
         $this->yellow = $yellow;
         $this->yellow->system->setDefault("SurlParam", "s");
-        $this->yellow->system->set("SurlList", "yellow-surl.ini");
+        $this->yellow->system->setDefault("SurlList", "yellow-surl.ini");
     }
 
-    public function onParsePageOutput($page, $text)
-    {
-        $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
-        //Short URL redirects    
+    public function onParsePageOutput($page, $text) {
+        $surlParam = $this->yellow->system->get("SurlParam");
+        $surlID = $page->getRequest($surlParam);
+        
+        if (is_string_empty($surlID)) return $text; // IDがなければ何もしない
+
         $redirectLocation = null;
-        $surlID = $page->getRequest($this->yellow->system->get("SurlParam"));
+
+        // 1. 各ページのメタデータ(surl: xxx)から探す
         $pages = $this->yellow->content->index()->filter("surl", $surlID);
-        $this->yellow->page->setLastModified($pages->getModified());
         if (count($pages) == 1) {
-            foreach ($pages as $page) {
-                $redirectLocation = $page->getLocation();
-            }
+            $redirectLocation = $pages->first()->getLocation();
         }
-        if ($redirectLocation) {
-            $url = $this->getAbsoluteUrl() . $redirectLocation;
-            header("Location: " . $url, true, 301);
-            exit();
-        }
-        if (file_exists($extensionDirectory . $this->yellow->system->get("SurlList"))) {
-            $list = $this->yellow->toolbox->readFile($extensionDirectory . $this->yellow->system->get("SurlList"));
-            $list = str_replace(array("\r\n", "\r", "\n"), "\n", $list);
-            $list = explode("\n", $list);
-            foreach ($list as $l) {
-                if (strpos($l, '||')) {
-                    $r = explode('||', trim($l));
-                    if ($surlID == trim($r[0])) {
-                        $url = $this->getAbsoluteUrl() . ($r[1]);
-                        header("Location: " . $url, true, 301);
-                        exit();
+
+        // 2. 外部リスト(yellow-surl.ini)から探す
+        if (!$redirectLocation) {
+            $extensionDirectory = $this->yellow->system->get("coreExtensionDirectory");
+            $fileName = $extensionDirectory . $this->yellow->system->get("SurlList");
+            if (is_file($fileName)) {
+                $list = $this->yellow->toolbox->readFile($fileName);
+                foreach (explode("\n", str_replace(["\r\n", "\r"], "\n", $list)) as $line) {
+                    if (strpos($line, '||') !== false) {
+                        list($id, $loc) = explode('||', $line, 2);
+                        if (trim($id) === $surlID) {
+                            $redirectLocation = trim($loc);
+                            break;
+                        }
                     }
                 }
             }
         }
+
+        // リダイレクト実行
+        if ($redirectLocation) {
+            $url = $this->getAbsoluteUrl() . $redirectLocation;
+            // すでに出力が始まっていないか確認してリダイレクト
+            if (!headers_sent()) {
+                header("Location: " . $url, true, 301);
+                exit();
+            }
+        }
+        
+        return $text;
     }
 
-    public function getAbsoluteUrl()
-    {
-		$protocol = ($_SERVER["HTTPS"]) ? "https" : "http";
-		$output = $protocol . '://' . $_SERVER['SERVER_NAME'];
-        return $output;
+    public function getAbsoluteUrl() {
+        $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        $protocol = $isHttps ? "https" : "http";
+        $serverName = $_SERVER['SERVER_NAME'] ?? 'localhost';
+        return $protocol . '://' . $serverName;
     }
 }
